@@ -62,6 +62,7 @@ const activeFilterCount = computed(() => {
 })
 
 function clearFilters() {
+  if (activeFilterCount.value === 0) return
   status.value = undefined
   categoryId.value = undefined
   colorId.value = undefined
@@ -166,7 +167,7 @@ const sortOptions = [
       <div class="w-px bg-gray-200 self-stretch mx-1" />
 
       <!-- Price range -->
-      <div class="flex items-center gap-1.5">
+      <!-- <div class="flex items-center gap-1.5">
         <UInput
           v-model.number="minPrice"
           type="number"
@@ -192,7 +193,7 @@ const sortOptions = [
             <span class="text-xs text-gray-400">$</span>
           </template>
         </UInput>
-      </div>
+      </div> -->
 
       <!-- Spacer -->
       <div class="flex-1" />
@@ -214,7 +215,7 @@ const sortOptions = [
 
       <!-- Clear -->
       <UButton
-        v-if="activeFilterCount > 0"
+        :disabled="activeFilterCount === 0"
         color="neutral"
         variant="outline"
         size="sm"

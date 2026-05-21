@@ -7,7 +7,7 @@ import ProductFiltersForm from './ProductFiltersForm.vue'
 
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 const currentPage = ref(1)
 const activeFilters = ref<ProductFilters>({ sort: 'createdAt' })
 
@@ -128,6 +128,7 @@ const columns: TableColumn<Content>[] = [
       </p>
       <UPagination
         v-model:page="currentPage"
+        variant="ghost"
         :total="totaElements ?? 0"
         :items-per-page="PAGE_SIZE"
         @update:page="load"
