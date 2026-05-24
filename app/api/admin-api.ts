@@ -1,6 +1,5 @@
 import { useAuthStore } from '~/features/auth/store/auth'
 
-
 export function createAdminApi() {
   const authStore = useAuthStore()
 

@@ -14,22 +14,22 @@ const items: NavigationMenuItem[] = [
   {
     label: 'Productos',
     icon: 'i-lucide-shopping-bag',
-    to: '/admin/products'
+    to: '/admin/product'
   },
   {
     label: 'Categorías',
     icon: 'i-lucide-tag',
-    to: '/admin/categories'
+    to: '/admin/category'
   },
   {
     label: 'Órdenes',
     icon: 'i-lucide-package',
-    to: '/admin/orders'
+    to: '/admin/order'
   },
   {
     label: 'Clientes',
     icon: 'i-lucide-users',
-    to: '/admin/customers'
+    to: '/admin/customer'
   }
 ]
 const initials = computed(() => {

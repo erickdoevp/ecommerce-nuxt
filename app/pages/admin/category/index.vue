@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PaginatedProductTable from '~/features/product/components/PaginatedProductTable.vue'
+import PaginatedCategoryTable from '~/features/category/components/PaginatedCategoryTable.vue'
 </script>
 
 <template>
@@ -7,21 +7,22 @@ import PaginatedProductTable from '~/features/product/components/PaginatedProduc
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-xl font-semibold text-gray-900">
-          Productos
+          Categorías
         </h1>
         <p class="text-sm text-gray-500 mt-0.5">
-          Administra el catálogo de productos de la tienda.
+          Administra las categorías del catálogo.
         </p>
       </div>
       <UButton
         icon="i-lucide-plus"
-        to="/admin/product/create"
+        to="/admin/category/create"
       >
-        Nuevo producto
+        Nueva categoría
       </UButton>
     </div>
-    <div class="bg-white p-4 rounded-md">
-      <PaginatedProductTable />
+
+    <div class="bg-white p-4">
+      <PaginatedCategoryTable />
     </div>
   </div>
 </template>

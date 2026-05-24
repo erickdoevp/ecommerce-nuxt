@@ -1,25 +1,16 @@
 <script setup lang="ts">
-import type { Category, CategoryOption } from '../types/category'
+import type { CategoryOption } from '../types/category'
 import { productSchema } from '../schemas/product.schema'
 import { useProductForm } from '../composables/useProductForm'
 import type { SelectOption } from '~/components/types/select'
 
-const props = defineProps<{
+defineProps<{
   selectSizes: SelectOption[]
   selectColors: SelectOption[]
-  selectCategories: Category[]
+  selectCategories: CategoryOption[]
 }>()
 
 const { form, wordCount } = useProductForm()
-
-function flattenCategories(cats: Category[] | undefined, depth = 0): CategoryOption[] {
-  return cats?.flatMap(cat => [
-    { label: cat.name, value: cat.id, depth, isParent: cat?.children?.length > 0 },
-    ...flattenCategories(cat?.children, depth + 1)
-  ]) || []
-}
-
-const flatCategories = computed(() => flattenCategories(props.selectCategories))
 
 const toolbarItems = [
   [
@@ -60,14 +51,6 @@ const toolbarItems = [
     >
       <!-- Información general -->
       <div class="col-span-2 p-6 border border-[#ececed] rounded-xl bg-white">
-        <div class="mb-5">
-          <h3 class="font-semibold text-base">
-            Información general del producto
-          </h3>
-          <p class="text-sm text-gray-500 mt-0.5">
-            Completa los detalles básicos del producto como nombre, descripción y precio.
-          </p>
-        </div>
         <div class="space-y-5">
           <div class="grid grid-cols-2 gap-4">
             <UFormField
@@ -93,7 +76,6 @@ const toolbarItems = [
               />
             </UFormField>
           </div>
-
           <div class="grid grid-cols-2 gap-4">
             <UFormField
               label="Precio base"
@@ -120,7 +102,7 @@ const toolbarItems = [
             >
               <USelectMenu
                 v-model="form.categoryId"
-                :items="flatCategories"
+                :items="selectCategories"
                 value-key="value"
                 placeholder="Selecciona una categoría"
                 class="w-full"

@@ -8,6 +8,7 @@ export interface ProductSearchQuery {
   maxPrice?: number
   sizeId?: string
   colorId?: string
+  name?: string
 }
 
 export interface ProductSearchResponse {

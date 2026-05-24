@@ -3,7 +3,7 @@ import { useDebounceFn } from '@vueuse/core'
 import type { ProductSearchQuery } from '../types/product-search'
 import { useListColor } from '../composables/useListColor'
 import { useListSize } from '../composables/useListSize'
-import { useListCategory } from '../composables/useListCategory'
+import { useListCategory } from '../../category/composables/useListCategory'
 
 export type ProductFilters = Omit<ProductSearchQuery, 'page' | 'size'>
 
@@ -11,6 +11,7 @@ const emit = defineEmits<{
   change: [filters: ProductFilters]
 }>()
 
+const name = ref('')
 const status = ref<ProductSearchQuery['status']>()
 const categoryId = ref<string>()
 const colorId = ref<string>()
@@ -32,6 +33,7 @@ onMounted(() => {
 function buildFilters(): ProductFilters {
   return {
     sort: sort.value,
+    name: name.value || undefined,
     status: status.value,
     categoryId: categoryId.value,
     colorId: colorId.value,
@@ -45,13 +47,14 @@ function emitChange() {
   emit('change', buildFilters())
 }
 
-const debouncedPriceChange = useDebounceFn(emitChange, 600)
+const debouncedEmit = useDebounceFn(emitChange, 500)
 
 watch([status, categoryId, colorId, sizeId, sort], emitChange)
-watch([minPrice, maxPrice], debouncedPriceChange)
+watch([name, minPrice, maxPrice], debouncedEmit)
 
 const activeFilterCount = computed(() => {
   let count = 0
+  if (name.value) count++
   if (status.value) count++
   if (categoryId.value) count++
   if (colorId.value) count++
@@ -63,6 +66,7 @@ const activeFilterCount = computed(() => {
 
 function clearFilters() {
   if (activeFilterCount.value === 0) return
+  name.value = ''
   status.value = undefined
   categoryId.value = undefined
   colorId.value = undefined
@@ -89,14 +93,29 @@ const sortOptions = [
 <template>
   <div class="bg-white space-y-3">
     <!-- Row 1: categorical filters -->
-    <div class="flex flex-wrap gap-2">
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      <!-- Name search -->
+      <UInput
+        v-model="name"
+        placeholder="Buscar por nombre..."
+        class="w-full"
+      >
+        <template #leading>
+          <UIcon
+            name="i-lucide-search"
+            class="w-3.5 h-3.5 text-gray-400"
+          />
+        </template>
+      </UInput>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 items-center gap-2">
       <!-- Status -->
       <USelectMenu
         v-model="status"
         :items="statusOptions"
         value-key="value"
         placeholder="Estado"
-        class="w-36"
+        class="w-full"
       >
         <template #leading>
           <UIcon
@@ -113,7 +132,7 @@ const sortOptions = [
         value-key="value"
         placeholder="Categoría"
         :loading="loadingCategories"
-        class="w-44"
+        class="w-full"
         searchable
         search-placeholder="Buscar categoría..."
       >
@@ -132,7 +151,7 @@ const sortOptions = [
         value-key="value"
         placeholder="Color"
         :loading="loadingColors"
-        class="w-36"
+        class="w-full"
         searchable
         search-placeholder="Buscar color..."
       >
@@ -151,7 +170,7 @@ const sortOptions = [
         value-key="value"
         placeholder="Talla"
         :loading="loadingSize"
-        class="w-32"
+        class="w-full"
         searchable
         search-placeholder="Buscar talla..."
       >
@@ -163,47 +182,12 @@ const sortOptions = [
         </template>
       </USelectMenu>
 
-      <!-- Divider -->
-      <div class="w-px bg-gray-200 self-stretch mx-1" />
-
-      <!-- Price range -->
-      <!-- <div class="flex items-center gap-1.5">
-        <UInput
-          v-model.number="minPrice"
-          type="number"
-          placeholder="Precio min"
-          min="0"
-          class="w-32"
-          :ui="{ base: 'text-sm' }"
-        >
-          <template #leading>
-            <span class="text-xs text-gray-400">$</span>
-          </template>
-        </UInput>
-        <span class="text-gray-300 text-sm">—</span>
-        <UInput
-          v-model.number="maxPrice"
-          type="number"
-          placeholder="Precio max"
-          min="0"
-          class="w-32"
-          :ui="{ base: 'text-sm' }"
-        >
-          <template #leading>
-            <span class="text-xs text-gray-400">$</span>
-          </template>
-        </UInput>
-      </div> -->
-
-      <!-- Spacer -->
-      <div class="flex-1" />
-
       <!-- Sort -->
       <USelectMenu
         v-model="sort"
         :items="sortOptions"
         value-key="value"
-        class="w-48"
+        class="w-full"
       >
         <template #leading>
           <UIcon
@@ -220,6 +204,7 @@ const sortOptions = [
         variant="outline"
         size="sm"
         icon="i-lucide-x"
+        class="w-fit"
         @click="clearFilters"
       >
         Limpiar

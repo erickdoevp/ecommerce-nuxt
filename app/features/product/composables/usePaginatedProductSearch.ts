@@ -20,7 +20,8 @@ export const usePaginatedProductSearch = () => {
           minPrice: query.minPrice,
           maxPrice: query.maxPrice,
           sizeId: query.sizeId,
-          colorId: query.colorId
+          colorId: query.colorId,
+          name: query.name
         }
       })
       productSearchResponse.value = response

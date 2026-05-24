@@ -1,57 +1,57 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Content } from '../types/product-search'
-import type { ProductFilters } from './ProductFiltersForm.vue'
-import { usePaginatedProductSearch } from '../composables/usePaginatedProductSearch'
-import ProductFiltersForm from './ProductFiltersForm.vue'
+import type { CategoryContent } from '../types/category-search'
+import type { CategoryFilters } from './CategoryFiltersForm.vue'
+import { usePaginatedCategorySearch } from '../composables/usePaginatedCategorySearch'
+import CategoryFiltersForm from './CategoryFiltersForm.vue'
+import { useListCategory } from '../composables/useListCategory'
 
-const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
+const { searchCategories, categories, isLoading, totalElements } = usePaginatedCategorySearch()
+const { selectCategories, getCategories } = useListCategory()
 
 const PAGE_SIZE = 10
 const currentPage = ref(1)
-const activeFilters = ref<ProductFilters>({ sort: 'createdAt' })
+const activeFilters = ref<CategoryFilters>({ sort: 'createdAt,desc' })
 
-onMounted(() => load(1))
+onMounted(() => {
+  getCategories()
+  load(1)
+})
 
 async function load(page: number) {
   currentPage.value = page
-  await searchProducts({
+  await searchCategories({
     page: page - 1,
     size: PAGE_SIZE,
     ...activeFilters.value
   })
 }
 
-function onFiltersChange(filters: ProductFilters) {
+function onFiltersChange(filters: CategoryFilters) {
   activeFilters.value = filters
   load(1)
 }
 
-const statusConfig: Record<string, { label: string, color: 'neutral' | 'success' | 'error' | 'warning' }> = {
-  DRAFT: { label: 'Borrador', color: 'neutral' },
-  ACTIVE: { label: 'Activo', color: 'success' },
-  INACTIVE: { label: 'Inactivo', color: 'error' }
-}
-
-const columns: TableColumn<Content>[] = [
+const columns: TableColumn<CategoryContent>[] = [
   { id: 'index', header: '#' },
   { id: 'image', header: 'Imagen' },
   { accessorKey: 'name', header: 'Nombre' },
   { accessorKey: 'slug', header: 'Slug' },
-  { accessorKey: 'category', header: 'Categoría' },
-  { accessorKey: 'basePrice', header: 'Precio base' },
-  { accessorKey: 'status', header: 'Estado' },
+  { id: 'parent', header: 'Categoría padre' },
+  { accessorKey: 'active', header: 'Estado' },
   { id: 'actions', header: 'Acciones' }
 ]
 </script>
 
 <template>
   <div class="space-y-3">
-    <ProductFiltersForm @change="onFiltersChange" />
-
+    <CategoryFiltersForm
+      :select-categories="selectCategories"
+      @change="onFiltersChange"
+    />
     <div class="flex-1 overflow-auto border border-solid rounded-lg border-default">
       <UTable
-        :data="products ?? []"
+        :data="categories"
         :columns="columns"
         :loading="isLoading"
         class="border border-[#ececed] rounded-xl overflow-hidden"
@@ -64,8 +64,8 @@ const columns: TableColumn<Content>[] = [
 
         <template #image-cell="{ row }">
           <img
-            v-if="row.original.primaryImageUrl"
-            :src="row.original.primaryImageUrl"
+            v-if="row.original.imageUrl"
+            :src="row.original.imageUrl"
             :alt="row.original.name"
             class="w-11 h-11 rounded-lg object-cover"
           >
@@ -74,39 +74,45 @@ const columns: TableColumn<Content>[] = [
             class="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center shrink-0"
           >
             <UIcon
-              name="i-lucide-image"
+              name="i-lucide-tag"
               class="w-5 h-5 text-gray-300"
             />
           </div>
         </template>
 
         <template #name-cell="{ row }">
-          <p class="font-medium text-sm text-gray-900 leading-tight">
-            {{ row.original.name }}
-          </p>
+          <div>
+            <p class="font-medium text-sm text-gray-900 leading-tight">
+              {{ row.original.name }}
+            </p>
+            <p class="text-xs text-gray-400 mt-0.5">
+              {{ row.original.slug }}
+            </p>
+          </div>
         </template>
 
-        <template #slug-cell="{ row }">
-          <span class="text-xs text-gray-400 font-mono">{{ row.original.slug }}</span>
-        </template>
-
-        <template #category-cell="{ row }">
-          <span class="text-sm text-gray-600">{{ row.original.category.name }}</span>
-        </template>
-
-        <template #basePrice-cell="{ row }">
-          <span class="text-sm font-semibold text-gray-800">
-            ${{ row.original.basePrice.toFixed(2) }}
+        <template #parent-cell="{ row }">
+          <span
+            v-if="row.original.parent"
+            class="text-sm text-gray-600"
+          >
+            {{ row.original.parent.name }}
+          </span>
+          <span
+            v-else
+            class="text-xs text-gray-300"
+          >
+            —
           </span>
         </template>
 
-        <template #status-cell="{ row }">
+        <template #active-cell="{ row }">
           <UBadge
-            :color="statusConfig[row.original.status]?.color ?? 'neutral'"
+            :color="row.original.active ? 'success' : 'neutral'"
             variant="subtle"
             size="sm"
           >
-            {{ statusConfig[row.original.status]?.label ?? row.original.status }}
+            {{ row.original.active ? 'Activo' : 'Inactivo' }}
           </UBadge>
         </template>
 
@@ -117,14 +123,14 @@ const columns: TableColumn<Content>[] = [
               variant="ghost"
               size="sm"
               icon="i-lucide-pencil"
-              :to="`/admin/product/${row.original.id}/edit`"
+              :to="`/admin/category/${row.original.id}/edit`"
             />
             <UButton
               color="neutral"
               variant="ghost"
               size="sm"
               icon="i-lucide-eye"
-              :to="`/admin/product/${row.original.id}`"
+              :to="`/admin/category/${row.original.id}`"
             />
           </div>
         </template>
@@ -133,12 +139,12 @@ const columns: TableColumn<Content>[] = [
 
     <div class="flex items-center justify-between px-1">
       <p class="text-sm text-gray-500">
-        <span class="font-medium text-gray-700">{{ totaElements ?? 0 }}</span> productos en total
+        <span class="font-medium text-gray-700">{{ totalElements }}</span> categorías en total
       </p>
       <UPagination
         v-model:page="currentPage"
         variant="ghost"
-        :total="totaElements ?? 0"
+        :total="totalElements"
         :items-per-page="PAGE_SIZE"
         @update:page="load"
       />

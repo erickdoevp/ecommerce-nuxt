@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTreeCategory } from '~/features/category/composables/useTreeCategory'
 import CreateProductForm from '~/features/product/components/CreateProductForm.vue'
 import ProductMediaCard from '~/features/product/components/ProductMediaCard.vue'
 import ProductState from '~/features/product/components/ProductState.vue'
@@ -7,26 +8,12 @@ import { useCreateProduct } from '~/features/product/composables/useCreateProduc
 import { useListColor } from '~/features/product/composables/useListColor'
 import { useListSize } from '~/features/product/composables/useListSize'
 import { useProductForm } from '~/features/product/composables/useProductForm'
-import type { Category } from '~/features/product/types/category'
 
 const { getSizes, selectSizes } = useListSize()
 const { getColors, selectColors } = useListColor()
+const { getCategories, treeSelectCategory } = useTreeCategory()
 const { form, images, variantGrid, variantData } = useProductForm()
 const { createProduct } = useCreateProduct()
-
-const categories = ref<Category[]>([
-  {
-    active: true,
-    createdAt: '2026-05-16T22:33:25.536901',
-    description: null,
-    id: '2d7b591c-708d-43b4-8d75-d7861d355fa8',
-    imageUrl: null,
-    name: 'Body',
-    parent: null,
-    slug: 'body',
-    updatedAt: '2026-05-16T22:33:25.536901'
-  }
-])
 
 function onSave(): void {
   const variants = variantGrid.value.map((row) => {
@@ -40,7 +27,6 @@ function onSave(): void {
       initialStock: v.initialStock ?? 0
     }
   })
-  console.log(variants)
 
   const data = {
     name: form.name,
@@ -71,16 +57,25 @@ function onSave(): void {
 onMounted(() => {
   getColors()
   getSizes()
+  getCategories()
 })
 </script>
 
 <template>
   <div class="page-container">
     <UContainer>
+      <div class="flex flex-col gap-1 mb-6">
+        <h1 class="text-xl font-semibold text-gray-900">
+          Nuevo producto
+        </h1>
+        <p class="text-sm text-gray-500 mt-0.5">
+          Completa los datos para agregar un nuevo producto a la tienda.
+        </p>
+      </div>
       <div class="flex flex-row gap-3">
         <div class="flex flex-col gap-3 w-[70%]">
           <CreateProductForm
-            :select-categories="categories"
+            :select-categories="treeSelectCategory"
             :select-sizes="selectSizes"
             :select-colors="selectColors"
           />
