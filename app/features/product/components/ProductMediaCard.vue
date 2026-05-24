@@ -41,8 +41,8 @@ function removeImage(id: string) {
   if (idx === -1) return
   const img = images.value[idx]
   if (!img) return
-  URL.revokeObjectURL(img.originalUrl)
-  if (img?.displayUrl !== img?.originalUrl) URL.revokeObjectURL(img.displayUrl)
+  if (img.originalUrl.startsWith('blob:')) URL.revokeObjectURL(img.originalUrl)
+  if (img.displayUrl !== img.originalUrl && img.displayUrl.startsWith('blob:')) URL.revokeObjectURL(img.displayUrl)
   images.value.splice(idx, 1)
 }
 
@@ -83,8 +83,8 @@ function flipY() {
 
 onUnmounted(() => {
   for (const img of images.value) {
-    URL.revokeObjectURL(img.originalUrl)
-    if (img.displayUrl !== img.originalUrl) URL.revokeObjectURL(img.displayUrl)
+    if (img.originalUrl.startsWith('blob:')) URL.revokeObjectURL(img.originalUrl)
+    if (img.displayUrl !== img.originalUrl && img.displayUrl.startsWith('blob:')) URL.revokeObjectURL(img.displayUrl)
   }
 })
 </script>

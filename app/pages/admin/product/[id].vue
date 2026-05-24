@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useTreeCategory } from '~/features/category/composables/useTreeCategory'
 import CreateProductForm from '~/features/product/components/CreateProductForm.vue'
+import ProductMediaCard from '~/features/product/components/ProductMediaCard.vue'
 import ProductState from '~/features/product/components/ProductState.vue'
+import ProductVariantsCard from '~/features/product/components/ProductVariantsCard.vue'
 import { useListColor } from '~/features/product/composables/useListColor'
 import { useListSize } from '~/features/product/composables/useListSize'
 import { useProductDetail } from '~/features/product/composables/useProductDetail'
@@ -40,6 +42,13 @@ onMounted(() => {
             :select-categories="treeSelectCategory"
             :select-sizes="selectSizes"
             :select-colors="selectColors"
+          />
+
+          <ProductMediaCard />
+
+          <ProductVariantsCard
+            :select-colors="selectColors"
+            :select-sizes="selectSizes"
           />
         </div>
         <div class="flex flex-col gap-3 flex-1">

@@ -11,18 +11,23 @@ import type { SizeAdded } from './AddSizeModal.vue'
 import { useProductForm } from '../composables/useProductForm'
 
 const props = defineProps<{
-  basePrice?: number
   iva?: number
   selectSizes: SelectOption[]
   selectColors: SelectOption[]
 }>()
 
-const { variantGrid, variantData } = useProductForm()
+const { variantGrid, variantData, colors, sizes, isInitializing, form } = useProductForm()
 
-const colors = ref<string[]>([])
-const sizes = ref<string[]>([])
 const showColorInput = ref(false)
 const showSizeInput = ref(false)
+
+watch(colors, (val) => {
+  if (val.length > 0) showColorInput.value = true
+}, { immediate: true })
+
+watch(sizes, (val) => {
+  if (val.length > 0) showSizeInput.value = true
+}, { immediate: true })
 
 const colorHexMap: Record<string, string> = {
   rojo: '#ef4444', roja: '#ef4444',
@@ -73,6 +78,7 @@ function deleteVariant(id: string): void {
 }
 
 watch([colors, sizes], ([newColors, newSizes]) => {
+  if (isInitializing.value) return
   const newGrid: VariantGridRow[] = []
   for (const color of newColors) {
     for (const size of newSizes) {
@@ -100,7 +106,7 @@ function getAdjustAmount(id: string): number {
 }
 
 function getSuggestedPrice(id: string): number {
-  const base = props.basePrice ?? 0
+  const base = form.basePrice ?? 0
   return base * (1 + getAdjustPercent(id) / 100) + getAdjustAmount(id)
 }
 
@@ -404,13 +410,19 @@ const columns = [
                 class="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer text-sm text-primary border-t border-gray-100"
                 @mousedown.prevent="openAddColorModal"
               >
-                <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 shrink-0" />
+                <UIcon
+                  name="i-lucide-plus"
+                  class="w-3.5 h-3.5 shrink-0"
+                />
                 Agregar color
               </li>
             </ul>
           </div>
 
-          <AddColorModal v-model:open="showAddColorModal" @add="onColorAdded" />
+          <AddColorModal
+            v-model:open="showAddColorModal"
+            @add="onColorAdded"
+          />
         </template>
       </div>
 
@@ -465,13 +477,19 @@ const columns = [
                 class="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer text-sm text-primary border-t border-gray-100"
                 @mousedown.prevent="openAddSizeModal"
               >
-                <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 shrink-0" />
+                <UIcon
+                  name="i-lucide-plus"
+                  class="w-3.5 h-3.5 shrink-0"
+                />
                 Agregar talla
               </li>
             </ul>
           </div>
 
-          <AddSizeModal v-model:open="showAddSizeModal" @add="onSizeAdded" />
+          <AddSizeModal
+            v-model:open="showAddSizeModal"
+            @add="onSizeAdded"
+          />
         </template>
       </div>
     </div>
@@ -550,7 +568,10 @@ const columns = [
                 class="w-12 h-12 rounded-md border-2 border-dashed border-gray-200 hover:border-primary flex items-center justify-center transition-colors cursor-pointer"
                 @click="onVariantImageClick(row.original.id)"
               >
-                <UIcon name="i-lucide-image-plus" class="w-5 h-5 text-gray-300" />
+                <UIcon
+                  name="i-lucide-image-plus"
+                  class="w-5 h-5 text-gray-300"
+                />
               </button>
 
               <!-- Has image: show with overlay -->
@@ -565,21 +586,30 @@ const columns = [
                     class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
                     @click="onVariantImageClick(row.original.id)"
                   >
-                    <UIcon name="i-lucide-pencil" class="w-3 h-3 text-gray-700" />
+                    <UIcon
+                      name="i-lucide-pencil"
+                      class="w-3 h-3 text-gray-700"
+                    />
                   </button>
                   <button
                     type="button"
                     class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
                     @click="replaceVariantImage(row.original.id)"
                   >
-                    <UIcon name="i-lucide-refresh-cw" class="w-3 h-3 text-gray-700" />
+                    <UIcon
+                      name="i-lucide-refresh-cw"
+                      class="w-3 h-3 text-gray-700"
+                    />
                   </button>
                   <button
                     type="button"
                     class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
                     @click="removeVariantImage(row.original.id)"
                   >
-                    <UIcon name="i-lucide-trash-2" class="w-3 h-3 text-red-500" />
+                    <UIcon
+                      name="i-lucide-trash-2"
+                      class="w-3 h-3 text-red-500"
+                    />
                   </button>
                 </div>
               </template>
@@ -694,22 +724,50 @@ const columns = [
           :src="variantCropperSrc"
         />
         <div class="flex items-center gap-2 mt-4">
-          <UButton color="neutral" variant="outline" size="sm" icon="i-lucide-rotate-ccw" @click="rotateVariant(-90)">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            icon="i-lucide-rotate-ccw"
+            @click="rotateVariant(-90)"
+          >
             Rotar izq.
           </UButton>
-          <UButton color="neutral" variant="outline" size="sm" icon="i-lucide-rotate-cw" @click="rotateVariant(90)">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            icon="i-lucide-rotate-cw"
+            @click="rotateVariant(90)"
+          >
             Rotar der.
           </UButton>
-          <UButton color="neutral" variant="outline" size="sm" icon="i-lucide-flip-horizontal-2" @click="flipVariantX">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            icon="i-lucide-flip-horizontal-2"
+            @click="flipVariantX"
+          >
             Voltear H
           </UButton>
-          <UButton color="neutral" variant="outline" size="sm" icon="i-lucide-flip-vertical-2" @click="flipVariantY">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            icon="i-lucide-flip-vertical-2"
+            @click="flipVariantY"
+          >
             Voltear V
           </UButton>
         </div>
       </template>
       <template #footer>
-        <UButton color="neutral" variant="outline" @click="showVariantCropperModal = false">
+        <UButton
+          color="neutral"
+          variant="outline"
+          @click="showVariantCropperModal = false"
+        >
           Cancelar
         </UButton>
         <UButton @click="applyVariantEdit">

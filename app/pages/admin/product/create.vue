@@ -83,7 +83,6 @@ onMounted(() => {
           <ProductMediaCard />
 
           <ProductVariantsCard
-            :base-price="form.basePrice"
             :select-colors="selectColors"
             :select-sizes="selectSizes"
           />

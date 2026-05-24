@@ -1,6 +1,7 @@
 export interface MediaImage {
   id: string
-  file: File
+  file?: File
+  existingUrl?: string
   originalUrl: string
   displayUrl: string
   editedBlob?: Blob | null
