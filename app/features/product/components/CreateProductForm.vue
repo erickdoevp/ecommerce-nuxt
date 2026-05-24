@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CategoryOption } from '../types/category'
+import type { CategoryOption } from '../../category/types/category'
 import { productSchema } from '../schemas/product.schema'
 import { useProductForm } from '../composables/useProductForm'
 import type { SelectOption } from '~/components/types/select'

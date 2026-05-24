@@ -1,5 +1,6 @@
 import { createAdminApi } from '~/api/admin-api'
-import type { CategoryOption, CategoryTree } from '../../product/types/category'
+import type { CategoryOption } from '../types/category'
+import type { CategoryTree } from '../types/category-tree'
 
 function flattenCategories(cats: CategoryTree[] | undefined, depth = 0): CategoryOption[] {
   return cats?.flatMap(cat => [

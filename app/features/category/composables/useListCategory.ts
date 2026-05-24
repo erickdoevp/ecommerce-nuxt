@@ -1,6 +1,6 @@
 import { createAdminApi } from '~/api/admin-api'
 import type { SelectOption } from '~/components/types/select'
-import type { Category } from '../../product/types/category'
+import type { Category } from '../types/category'
 
 function buildTree(cats: Category[]): Category[] {
   const map = new Map<string, Category>()

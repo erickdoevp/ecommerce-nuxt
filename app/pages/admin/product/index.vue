@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import PaginatedProductTable from '~/features/product/components/PaginatedProductTable.vue'
+import { useProductForm } from '~/features/product/composables/useProductForm'
+
+const { cleanProductData } = useProductForm()
 </script>
 
 <template>
@@ -16,6 +19,7 @@ import PaginatedProductTable from '~/features/product/components/PaginatedProduc
       <UButton
         icon="i-lucide-plus"
         to="/admin/product/create"
+        @click="cleanProductData()"
       >
         Nuevo producto
       </UButton>

@@ -14,7 +14,7 @@ export const productSchema = z.object({
     .number({ error: 'Ingresa un precio válido' })
     .positive('El precio debe ser mayor a 0'),
   categoryId: z.string().min(1, 'Selecciona una categoría'),
-  status: z.enum(['DRAFT', 'ACTIVE', 'INACTIVE']),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'])
 })
 
 export type ProductSchema = z.infer<typeof productSchema>

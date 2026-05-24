@@ -117,7 +117,7 @@ const columns: TableColumn<Content>[] = [
               variant="ghost"
               size="sm"
               icon="i-lucide-pencil"
-              :to="`/admin/product/${row.original.id}/edit`"
+              :to="`/admin/product/${row.original.id}`"
             />
             <UButton
               color="neutral"
