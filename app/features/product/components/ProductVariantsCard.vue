@@ -50,7 +50,7 @@ const colorHexMap: Record<string, string> = {
 }
 
 function normalizeText(text: string): string {
-  return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
 function getColorHex(name: string): string {

@@ -4,8 +4,17 @@ import type { Content } from '../types/product-search'
 import type { ProductFilters } from './ProductFiltersForm.vue'
 import { usePaginatedProductSearch } from '../composables/usePaginatedProductSearch'
 import ProductFiltersForm from './ProductFiltersForm.vue'
+import ProductPreviewModal from './ProductPreviewModal.vue'
 
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
+
+const previewProductId = ref<string | null>(null)
+const showPreview = ref(false)
+
+function openPreview(id: string) {
+  previewProductId.value = id
+  showPreview.value = true
+}
 
 const PAGE_SIZE = 10
 const currentPage = ref(1)
@@ -124,7 +133,7 @@ const columns: TableColumn<Content>[] = [
               variant="ghost"
               size="sm"
               icon="i-lucide-eye"
-              :to="`/admin/product/${row.original.id}`"
+              @click="openPreview(row.original.id)"
             />
           </div>
         </template>
@@ -143,5 +152,10 @@ const columns: TableColumn<Content>[] = [
         @update:page="load"
       />
     </div>
+
+    <ProductPreviewModal
+      v-model:open="showPreview"
+      :product-id="previewProductId"
+    />
   </div>
 </template>
