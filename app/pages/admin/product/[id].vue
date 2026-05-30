@@ -49,6 +49,7 @@ onMounted(() => {
           <ProductVariantsCard
             :select-colors="selectColors"
             :select-sizes="selectSizes"
+            show-sku
           />
         </div>
         <div class="flex flex-col gap-3 flex-1">

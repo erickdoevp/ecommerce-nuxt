@@ -8,15 +8,95 @@ import AddColorModal from './AddColorModal.vue'
 import AddSizeModal from './AddSizeModal.vue'
 import type { ColorAdded } from './AddColorModal.vue'
 import type { SizeAdded } from './AddSizeModal.vue'
+import type { ExpandedState } from '@tanstack/vue-table'
 import { useProductForm } from '../composables/useProductForm'
 
 const props = defineProps<{
   iva?: number
+  showSku?: boolean
   selectSizes: SelectOption[]
   selectColors: SelectOption[]
 }>()
 
 const { variantGrid, variantData, colors, sizes, isInitializing, form } = useProductForm()
+
+// ─── Tree display types (local only, not exported) ───────────────────────────
+interface VariantChildRow extends VariantGridRow {
+  isParent: false
+  isAddRow?: never
+}
+
+interface AddSizeRow {
+  id: string
+  color: string
+  colorId: string
+  isParent: false
+  isAddRow: true
+  missingSizes: string[]
+}
+
+type ChildRow = VariantChildRow | AddSizeRow
+
+interface ColorGroupRow {
+  id: string
+  color: string
+  colorId: string
+  isParent: true
+  subRows: ChildRow[]
+}
+
+type AnyRow = ColorGroupRow | ChildRow
+
+// Computed tree from variantGrid — purely for display, variantGrid is NOT changed
+const treeData = computed<ColorGroupRow[]>(() => {
+  const map = new Map<string, ColorGroupRow>()
+  for (const row of variantGrid.value) {
+    if (!map.has(row.color)) {
+      map.set(row.color, {
+        id: `parent-${row.color}`,
+        color: row.color,
+        colorId: row.colorId,
+        isParent: true,
+        subRows: []
+      })
+    }
+    map.get(row.color)!.subRows.push({ ...row, isParent: false })
+  }
+  // Append an "add size" row for each color that has missing sizes
+  for (const group of map.values()) {
+    const present = new Set(group.subRows.filter((r): r is VariantChildRow => !r.isAddRow).map(r => r.size))
+    const missing = sizes.value.filter(s => !present.has(s))
+    if (missing.length > 0) {
+      group.subRows.push({
+        id: `add-${group.color}`,
+        color: group.color,
+        colorId: group.colorId,
+        isParent: false,
+        isAddRow: true,
+        missingSizes: missing
+      })
+    }
+  }
+  return Array.from(map.values())
+})
+
+// All parent groups start expanded; new groups added later also auto-expand
+const expanded = ref<ExpandedState>(true)
+
+watch(treeData, (newData) => {
+  if (expanded.value === true) return
+  const current = expanded.value as Record<string, boolean>
+  let changed = false
+  for (const group of newData) {
+    if (!(group.id in current)) {
+      current[group.id] = true
+      changed = true
+    }
+  }
+  if (changed) expanded.value = { ...current }
+})
+
+// ─── Color/options UI ────────────────────────────────────────────────────────
 
 const showColorInput = ref(false)
 const showSizeInput = ref(false)
@@ -50,7 +130,7 @@ const colorHexMap: Record<string, string> = {
 }
 
 function normalizeText(text: string): string {
-  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 }
 
 function getColorHex(name: string): string {
@@ -59,11 +139,7 @@ function getColorHex(name: string): string {
   return colorHexMap[normalizeText(name)] ?? '#9ca3af'
 }
 
-function generateSku(color: string, size: string): string {
-  const c = normalizeText(color).replace(/\s+/g, '').slice(0, 3).toUpperCase()
-  const s = size.toUpperCase().replace(/\s+/g, '')
-  return `${c}-${s}`
-}
+// ─── Variant data access (reads/writes variantData — unchanged) ───────────────
 
 function getVariant(id: string): VariantEditable {
   return variantData.value[id] ?? {}
@@ -75,6 +151,21 @@ function updateVariant(id: string, field: keyof VariantEditable, value: any): vo
 
 function deleteVariant(id: string): void {
   variantGrid.value = variantGrid.value.filter(r => r.id !== id)
+}
+
+function addVariantSize(color: string, colorId: string, size: string): void {
+  const sizeId = allSelectSizes.value.find(s => s.label === size)?.value ?? ''
+  const id = `${color}-${size}`
+  // Rebuild this color's rows sorted by sizes order, then splice back into grid
+  const thisColorRows = variantGrid.value.filter(r => r.color === color)
+  const colorStart = variantGrid.value.findIndex(r => r.color === color)
+  const newRow: VariantGridRow = { id, color, colorId, size, sizeId }
+  const sorted = sizes.value
+    .map(s => (s === size ? newRow : thisColorRows.find(r => r.size === s)))
+    .filter((r): r is VariantGridRow => r !== undefined)
+  const before = variantGrid.value.slice(0, colorStart)
+  const after = variantGrid.value.slice(colorStart + thisColorRows.length)
+  variantGrid.value = [...before, ...sorted, ...after]
 }
 
 watch([colors, sizes], ([newColors, newSizes]) => {
@@ -93,12 +184,8 @@ watch([colors, sizes], ([newColors, newSizes]) => {
 
 const hasVariants = computed(() => variantGrid.value.length > 0)
 
-function getSku(row: VariantGridRow): string {
-  return getVariant(row.id).sku ?? generateSku(row.color, row.size)
-}
-
-function getAdjustPercent(id: string): number {
-  return getVariant(id).adjustPercent ?? 0
+function getSku(id: string): string {
+  return getVariant(id).sku ?? ''
 }
 
 function getAdjustAmount(id: string): number {
@@ -107,7 +194,7 @@ function getAdjustAmount(id: string): number {
 
 function getSuggestedPrice(id: string): number {
   const base = form.basePrice ?? 0
-  return base * (1 + getAdjustPercent(id) / 100) + getAdjustAmount(id)
+  return base + getAdjustAmount(id)
 }
 
 function getFinalPrice(id: string): number {
@@ -125,6 +212,8 @@ function ivaLabel(): string {
 function formatCLP(n: number): string {
   return '$ ' + Math.round(n).toLocaleString('es-CL')
 }
+
+// ─── Extra colors/sizes (user-created) ───────────────────────────────────────
 
 const extraColors = ref<Array<SelectOption & { hex: string }>>([])
 const extraSizes = ref<SelectOption[]>([])
@@ -146,6 +235,8 @@ const allSelectSizes = computed(() => [
   ...props.selectSizes,
   ...extraSizes.value
 ])
+
+// ─── Color input ──────────────────────────────────────────────────────────────
 
 const colorQuery = ref('')
 const colorTagsRef = ref()
@@ -198,6 +289,8 @@ watch(showColorInput, (val) => {
   }
 })
 
+// ─── Size input ───────────────────────────────────────────────────────────────
+
 const sizeQuery = ref('')
 const sizeTagsRef = ref()
 const sizeInputFocused = ref(false)
@@ -248,6 +341,8 @@ watch(showSizeInput, (val) => {
     sizeInputFocused.value = false
   }
 })
+
+// ─── Variant image cropper ────────────────────────────────────────────────────
 
 const variantCropperRef = ref()
 const variantEditingId = ref<string | null>(null)
@@ -328,19 +423,20 @@ onUnmounted(() => {
   if (variantPendingObjectUrl.value) URL.revokeObjectURL(variantPendingObjectUrl.value)
 })
 
-const columns = [
-  { accessorKey: 'color', header: 'Color' },
-  { accessorKey: 'size', header: 'Talla' },
+// ─── Table columns ────────────────────────────────────────────────────────────
+
+const columns = computed(() => [
+  { id: 'colorOrSize', header: 'Color / Talla' },
   { id: 'image', header: 'Imagen' },
-  { id: 'sku', header: 'SKU' },
+  ...(props.showSku ? [{ id: 'sku', header: 'SKU' }] : []),
   { id: 'costPrice', header: 'Precio de costo' },
-  { id: 'suggestedPrice', header: 'Precio' },
-  { id: 'priceAdjust', header: 'Ajuste de precio' },
+  { id: 'priceAdjust', header: 'Ajuste' },
+  { id: 'suggestedPrice', header: 'Precio sugerido' },
   { id: 'finalPrice', header: 'Precio final' },
   { id: 'profit', header: 'Ganancia' },
   { id: 'initialStock', header: 'Stock inicial' },
   { id: 'actions', header: '' }
-]
+])
 </script>
 
 <template>
@@ -504,37 +600,22 @@ const columns = [
       </p>
       <div class="overflow-auto border border-solid rounded-lg border-default">
         <UTable
-          :data="variantGrid"
+          :data="treeData"
           :columns="columns"
+          :get-sub-rows="(row: any) => (row as ColorGroupRow).subRows"
+          :get-row-id="(row: any) => (row as AnyRow).id"
+          v-model:expanded="expanded"
         >
-          <!-- Custom headers -->
-          <template #sku-header>
-            <div class="leading-tight">
-              <div>SKU</div>
-              <div class="text-xs font-normal text-gray-400">
-                (Auto generado)
-              </div>
-            </div>
-          </template>
-
+          <!-- Column headers -->
           <template #priceAdjust-header>
             <div class="flex items-center gap-1">
-              <span>Ajuste de precio</span>
-              <UTooltip text="Porcentaje o monto fijo añadido al precio base para calcular el precio sugerido">
+              <span>Ajuste</span>
+              <UTooltip text="Monto fijo añadido al precio base para calcular el precio sugerido">
                 <UIcon
                   name="i-lucide-info"
                   class="w-3.5 h-3.5 text-gray-400 cursor-help"
                 />
               </UTooltip>
-            </div>
-          </template>
-
-          <template #suggestedPrice-header>
-            <div class="leading-tight">
-              <div>Precio</div>
-              <div class="text-xs font-normal text-gray-400">
-                (Sugerido)
-              </div>
             </div>
           </template>
 
@@ -547,164 +628,228 @@ const columns = [
             </div>
           </template>
 
-          <!-- Color cell -->
-          <template #color-cell="{ row }">
-            <div class="flex items-center gap-2">
-              <div
-                class="w-3 h-3 rounded-full border border-gray-300 shrink-0"
-                :style="{ backgroundColor: getColorHex(row.original.color) }"
-              />
-              <span>{{ row.original.color }}</span>
-            </div>
-          </template>
-
-          <!-- Image cell -->
-          <template #image-cell="{ row }">
-            <div class="relative group w-12 h-12">
-              <!-- No image: click to select -->
+          <!-- ── First column: color group (parent) or talla (child) ── -->
+          <template #colorOrSize-cell="{ row }">
+            <!-- Parent row: color group header with expand toggle -->
+            <template v-if="(row.original as AnyRow).isParent">
               <button
-                v-if="!getVariant(row.original.id).image"
                 type="button"
-                class="w-12 h-12 rounded-md border-2 border-dashed border-gray-200 hover:border-primary flex items-center justify-center transition-colors cursor-pointer"
-                @click="onVariantImageClick(row.original.id)"
+                class="flex items-center gap-2 w-full py-0.5"
+                @click="row.toggleExpanded()"
               >
                 <UIcon
-                  name="i-lucide-image-plus"
-                  class="w-5 h-5 text-gray-300"
+                  :name="row.getIsExpanded() ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+                  class="w-4 h-4 text-gray-400 shrink-0"
                 />
-              </button>
-
-              <!-- Has image: show with overlay -->
-              <template v-else>
-                <img
-                  :src="getVariant(row.original.id).image!"
-                  class="w-12 h-12 rounded-md object-cover border border-gray-200"
+                <div
+                  class="w-3 h-3 rounded-full border border-gray-300 shrink-0"
+                  :style="{ backgroundColor: getColorHex((row.original as ColorGroupRow).color) }"
+                />
+                <span class="font-medium text-gray-800">
+                  {{ (row.original as ColorGroupRow).color }}
+                </span>
+                <UBadge
+                  variant="subtle"
+                  color="neutral"
+                  size="sm"
                 >
-                <div class="absolute inset-0 rounded-md bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                  <button
-                    type="button"
-                    class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
-                    @click="onVariantImageClick(row.original.id)"
-                  >
-                    <UIcon
-                      name="i-lucide-pencil"
-                      class="w-3 h-3 text-gray-700"
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
-                    @click="replaceVariantImage(row.original.id)"
-                  >
-                    <UIcon
-                      name="i-lucide-refresh-cw"
-                      class="w-3 h-3 text-gray-700"
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
-                    @click="removeVariantImage(row.original.id)"
-                  >
-                    <UIcon
-                      name="i-lucide-trash-2"
-                      class="w-3 h-3 text-red-500"
-                    />
-                  </button>
-                </div>
-              </template>
-            </div>
+                  {{ (row.original as ColorGroupRow).subRows.filter(r => !r.isAddRow).length }} tallas
+                </UBadge>
+              </button>
+            </template>
+
+            <!-- Add-size row: button to re-add a deleted size -->
+            <template v-else-if="(row.original as AddSizeRow).isAddRow">
+              <UDropdownMenu
+                :items="[(row.original as AddSizeRow).missingSizes.map(s => ({
+                  label: s,
+                  onSelect: () => addVariantSize(
+                    (row.original as AddSizeRow).color,
+                    (row.original as AddSizeRow).colorId,
+                    s
+                  )
+                }))]"
+              >
+                <UButton
+                  variant="ghost"
+                  color="neutral"
+                  size="xs"
+                  icon="i-lucide-plus"
+                  class="ml-7 text-gray-400 hover:text-gray-700"
+                >
+                  Agregar talla
+                </UButton>
+              </UDropdownMenu>
+            </template>
+
+            <!-- Child row: size name with indent -->
+            <template v-else>
+              <span class="pl-7 text-sm text-gray-600">
+                {{ (row.original as VariantGridRow).size }}
+              </span>
+            </template>
           </template>
 
-          <!-- SKU cell -->
+          <!-- ── Image cell (child only) ── -->
+          <template #image-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <div class="relative group w-12 h-12">
+                <button
+                  v-if="!getVariant((row.original as VariantGridRow).id).image"
+                  type="button"
+                  class="w-12 h-12 rounded-md border-2 border-dashed border-gray-200 hover:border-primary flex items-center justify-center transition-colors cursor-pointer"
+                  @click="onVariantImageClick((row.original as VariantGridRow).id)"
+                >
+                  <UIcon
+                    name="i-lucide-image-plus"
+                    class="w-5 h-5 text-gray-300"
+                  />
+                </button>
+
+                <template v-else>
+                  <img
+                    :src="getVariant((row.original as VariantGridRow).id).image!"
+                    class="w-12 h-12 rounded-md object-cover border border-gray-200"
+                  >
+                  <div class="absolute inset-0 rounded-md bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <button
+                      type="button"
+                      class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
+                      @click="onVariantImageClick((row.original as VariantGridRow).id)"
+                    >
+                      <UIcon
+                        name="i-lucide-pencil"
+                        class="w-3 h-3 text-gray-700"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
+                      @click="replaceVariantImage((row.original as VariantGridRow).id)"
+                    >
+                      <UIcon
+                        name="i-lucide-refresh-cw"
+                        class="w-3 h-3 text-gray-700"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      class="w-5 h-5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center"
+                      @click="removeVariantImage((row.original as VariantGridRow).id)"
+                    >
+                      <UIcon
+                        name="i-lucide-trash-2"
+                        class="w-3 h-3 text-red-500"
+                      />
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </template>
+
+          <!-- ── SKU cell (child only, read-only) ── -->
           <template #sku-cell="{ row }">
-            <UInput
-              :model-value="getSku(row.original)"
-              size="sm"
-              class="w-28"
-              @update:model-value="updateVariant(row.original.id, 'sku', $event)"
-            />
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span class="text-sm text-gray-700 font-mono">
+                {{ getSku((row.original as VariantGridRow).id) }}
+              </span>
+            </template>
           </template>
 
-          <!-- Price adjust cell -->
-          <template #priceAdjust-cell="{ row }">
-            <div class="flex items-center gap-1">
+          <!-- ── Cost price cell (child only) ── -->
+          <template #costPrice-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
               <UInput
-                :model-value="getAdjustAmount(row.original.id)"
+                :model-value="getVariant((row.original as VariantGridRow).id).costPrice ?? 0"
                 type="number"
                 size="sm"
-                class="w-20"
-                @update:model-value="updateVariant(row.original.id, 'adjustAmount', Number($event) || 0)"
+                :min="0"
+                class="w-28"
+                @update:model-value="updateVariant((row.original as VariantGridRow).id, 'costPrice', Number($event) || 0)"
               >
                 <template #leading>
                   <span class="text-xs text-gray-500">$</span>
                 </template>
               </UInput>
-            </div>
+            </template>
           </template>
 
-          <!-- Suggested price cell -->
-          <template #suggestedPrice-cell="{ row }">
-            <span class="text-sm text-gray-700 whitespace-nowrap">
-              {{ formatCLP(getSuggestedPrice(row.original.id)) }}
-            </span>
-          </template>
-
-          <template #finalPrice-cell="{ row }">
-            <span class="text-sm font-medium text-gray-900 whitespace-nowrap">
-              {{ formatCLP(getFinalPrice(row.original.id)) }}
-            </span>
-          </template>
-
-          <!-- Cost price cell -->
-          <template #costPrice-cell="{ row }">
-            <UInput
-              :model-value="getVariant(row.original.id).costPrice ?? 0"
-              type="number"
-              size="sm"
-              :min="0"
-              class="w-28"
-              @update:model-value="updateVariant(row.original.id, 'costPrice', Number($event) || 0)"
-            >
-              <template #leading>
-                <span class="text-xs text-gray-500">$</span>
-              </template>
-            </UInput>
-          </template>
-
-          <template #profit-cell="{ row }">
-            <span
-              class="text-sm font-medium whitespace-nowrap"
-              :class="getProfit(row.original.id) >= 0 ? 'text-green-600' : 'text-red-500'"
-            >
-              {{ formatCLP(getProfit(row.original.id)) }}
-            </span>
-          </template>
-
-          <!-- Stock cell -->
-          <template #initialStock-cell="{ row }">
-            <UInputNumber
-              :model-value="getVariant(row.original.id).initialStock ?? 0"
-              size="sm"
-              :min="0"
-              :step="1"
-              class="w-20"
-              @update:model-value="updateVariant(row.original.id, 'initialStock', $event ?? 0)"
-            />
-          </template>
-
-          <!-- Actions cell -->
-          <template #actions-cell="{ row }">
-            <UDropdownMenu
-              :items="[[{ label: 'Eliminar', icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: () => deleteVariant(row.original.id) }]]"
-            >
-              <UButton
-                icon="i-lucide-ellipsis-vertical"
-                color="neutral"
-                variant="ghost"
+          <!-- ── Price adjust cell (child only) ── -->
+          <template #priceAdjust-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <UInput
+                :model-value="getAdjustAmount((row.original as VariantGridRow).id)"
+                type="number"
                 size="sm"
+                class="w-20"
+                @update:model-value="updateVariant((row.original as VariantGridRow).id, 'adjustAmount', Number($event) || 0)"
+              >
+                <template #leading>
+                  <span class="text-xs text-gray-500">$</span>
+                </template>
+              </UInput>
+            </template>
+          </template>
+
+          <!-- ── Suggested price cell (child only) ── -->
+          <template #suggestedPrice-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span class="text-sm text-gray-700 whitespace-nowrap">
+                {{ formatCLP(getSuggestedPrice((row.original as VariantGridRow).id)) }}
+              </span>
+            </template>
+          </template>
+
+          <!-- ── Final price cell (child only) ── -->
+          <template #finalPrice-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span class="text-sm font-medium text-gray-900 whitespace-nowrap">
+                {{ formatCLP(getFinalPrice((row.original as VariantGridRow).id)) }}
+              </span>
+            </template>
+          </template>
+
+          <!-- ── Profit cell (child only) ── -->
+          <template #profit-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span
+                class="text-sm font-medium whitespace-nowrap"
+                :class="getProfit((row.original as VariantGridRow).id) >= 0 ? 'text-green-600' : 'text-red-500'"
+              >
+                {{ formatCLP(getProfit((row.original as VariantGridRow).id)) }}
+              </span>
+            </template>
+          </template>
+
+          <!-- ── Stock cell (child only) ── -->
+          <template #initialStock-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <UInputNumber
+                :model-value="getVariant((row.original as VariantGridRow).id).initialStock ?? 0"
+                size="sm"
+                :min="0"
+                :step="1"
+                class="w-20"
+                @update:model-value="updateVariant((row.original as VariantGridRow).id, 'initialStock', $event ?? 0)"
               />
-            </UDropdownMenu>
+            </template>
+          </template>
+
+          <!-- ── Actions cell (child only) ── -->
+          <template #actions-cell="{ row }">
+            <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <UDropdownMenu
+                :items="[[{ label: 'Eliminar', icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: () => deleteVariant((row.original as VariantGridRow).id) }]]"
+              >
+                <UButton
+                  icon="i-lucide-ellipsis-vertical"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                />
+              </UDropdownMenu>
+            </template>
           </template>
         </UTable>
       </div>

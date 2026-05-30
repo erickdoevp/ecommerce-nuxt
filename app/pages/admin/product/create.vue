@@ -21,7 +21,6 @@ function onSave(): void {
     return {
       colorId: row.colorId,
       sizeId: row.sizeId,
-      ...(v.sku ? { sku: v.sku } : {}),
       priceAdjustment: v.adjustAmount ?? 0,
       costPrice: v.costPrice ?? 0,
       initialStock: v.initialStock ?? 0
