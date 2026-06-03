@@ -600,11 +600,11 @@ const columns = computed(() => [
       </p>
       <div class="overflow-auto border border-solid rounded-lg border-default">
         <UTable
+          v-model:expanded="expanded"
           :data="treeData"
           :columns="columns"
           :get-sub-rows="(row: any) => (row as ColorGroupRow).subRows"
           :get-row-id="(row: any) => (row as AnyRow).id"
-          v-model:expanded="expanded"
         >
           <!-- Column headers -->
           <template #priceAdjust-header>

@@ -7,7 +7,7 @@ const open = ref(true)
 
 const items: NavigationMenuItem[] = [
   {
-    label: 'Productos',
+    label: 'Catálogo',
     type: 'label',
     slot: 'settings-label' as const
   },
@@ -17,9 +17,34 @@ const items: NavigationMenuItem[] = [
     to: '/admin/product'
   },
   {
+    label: 'Inventario',
+    icon: 'i-lucide-warehouse',
+    to: '/admin/inventory'
+  },
+  {
     label: 'Categorías',
     icon: 'i-lucide-tag',
     to: '/admin/category'
+  },
+  {
+    label: 'Colores',
+    icon: 'i-lucide-palette',
+    to: '/admin/color'
+  },
+  {
+    label: 'Tallas',
+    icon: 'i-lucide-ruler',
+    to: '/admin/size'
+  },
+  {
+    label: 'Colecciones',
+    icon: 'i-lucide-layers',
+    to: '/admin/collection'
+  },
+  {
+    label: 'Operaciones',
+    type: 'label',
+    slot: 'settings-label' as const
   },
   {
     label: 'Órdenes',

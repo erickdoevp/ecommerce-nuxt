@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useCategoryForm } from '../composables/useCategoryForm'
+import { useCollectionForm } from '../composables/useCollectionForm'
 
-const { form } = useCategoryForm()
+const { form } = useCollectionForm()
 </script>
 
 <template>
-  <div class="p-6 border border-[#ececed] rounded-xl bg-white h-fit w-full">
+  <div class="p-6 border border-[#ececed] rounded-xl bg-white h-fit">
     <h3 class="font-semibold text-base mb-4">
-      Estado de la categoría
+      Estado
     </h3>
     <div class="flex items-center justify-between">
       <span class="text-sm text-gray-600">
@@ -17,8 +17,8 @@ const { form } = useCategoryForm()
     </div>
     <p class="text-xs text-gray-400 mt-2">
       {{ form.active
-        ? 'La categoría es visible en la tienda.'
-        : 'La categoría está oculta para los clientes.' }}
+        ? 'La colección es visible en la tienda.'
+        : 'La colección está oculta para los clientes.' }}
     </p>
   </div>
 </template>
