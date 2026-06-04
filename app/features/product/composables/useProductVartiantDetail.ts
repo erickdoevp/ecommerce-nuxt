@@ -10,7 +10,7 @@ export const useProductVariantDetail = () => {
     try {
       isLoading.value = true
       const api = createAdminApi()
-      const data = await api<ProductVariantDetail>(`/variants/${variantId}`)
+      const data = await api<ProductVariantDetail>(`/products/admin/variants/${variantId}`)
       entity.value = data
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al cargar la variante'

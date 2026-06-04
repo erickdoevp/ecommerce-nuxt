@@ -5,12 +5,21 @@ import { PRODUCT_STATUS_META } from '../types/variant-inventory'
 import { usePaginatedVariantSearch } from '../composables/usePaginatedVariantSearch'
 import VariantFiltersForm from './VariantFiltersForm.vue'
 import type { VariantFilters } from './VariantFiltersForm.vue'
+import VariantInventorySlideover from './VariantInventorySlideover.vue'
 
 const { searchVariants, variants, isLoading, totalElements } = usePaginatedVariantSearch()
 
 const PAGE_SIZE = 20
 const currentPage = ref(1)
 const activeFilters = ref<VariantFilters>({ sort: 'sku,asc' })
+
+const selectedVariantId = ref<string | null>(null)
+const showSlideover = ref(false)
+
+function openSlideover(variantId: string) {
+  selectedVariantId.value = variantId
+  showSlideover.value = true
+}
 
 onMounted(() => load(1))
 
@@ -46,7 +55,8 @@ const columns: TableColumn<VariantInventoryContent>[] = [
   { accessorKey: 'sizeName', header: 'Talla' },
   { accessorKey: 'finalPrice', header: 'Precio' },
   { id: 'stock', header: 'Stock' },
-  { id: 'productStatus', header: 'Estado' }
+  { id: 'productStatus', header: 'Estado' },
+  { id: 'actions', header: '' }
 ]
 </script>
 
@@ -139,6 +149,17 @@ const columns: TableColumn<VariantInventoryContent>[] = [
             {{ PRODUCT_STATUS_META[row.original.productStatus]?.label ?? row.original.productStatus }}
           </UBadge>
         </template>
+
+        <template #actions-cell="{ row }">
+          <UButton
+            icon="i-lucide-pencil"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            aria-label="Editar stock"
+            @click="openSlideover(row.original.variantId)"
+          />
+        </template>
       </UTable>
     </div>
 
@@ -154,5 +175,11 @@ const columns: TableColumn<VariantInventoryContent>[] = [
         @update:page="load"
       />
     </div>
+
+    <VariantInventorySlideover
+      v-model:open="showSlideover"
+      :variant-id="selectedVariantId"
+      @updated="load(currentPage)"
+    />
   </div>
 </template>
