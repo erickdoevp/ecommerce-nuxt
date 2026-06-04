@@ -22,6 +22,11 @@ const items: NavigationMenuItem[] = [
     to: '/admin/inventory'
   },
   {
+    label: 'Movimientos',
+    icon: 'i-lucide-arrow-left-right',
+    to: '/admin/inventory/movements'
+  },
+  {
     label: 'Categorías',
     icon: 'i-lucide-tag',
     to: '/admin/category'

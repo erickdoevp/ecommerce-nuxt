@@ -34,3 +34,6 @@ export const KARDEX_TYPE_META: Record<KardexType, { label: string, icon: string,
   ADJUSTMENT: { label: 'Ajuste', icon: 'i-lucide-sliders-horizontal', color: 'text-amber-600' },
   RETURN: { label: 'Devolución', icon: 'i-lucide-undo-2', color: 'text-purple-600' }
 }
+
+export const KARDEX_TYPE_OPTIONS = (Object.entries(KARDEX_TYPE_META) as [KardexType, { label: string }][])
+  .map(([value, meta]) => ({ label: meta.label, value }))

@@ -277,7 +277,7 @@ const inventoryValue = computed(() => (productVariantDetail.value?.costPrice ?? 
               </div>
               <ul
                 v-else
-                class="space-y-3"
+                class="space-y-3 max-h-56 overflow-y-auto pr-1"
               >
                 <li
                   v-for="m in kardex.content"
