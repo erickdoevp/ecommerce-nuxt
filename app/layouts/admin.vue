@@ -14,7 +14,24 @@ const items: NavigationMenuItem[] = [
   {
     label: 'Productos',
     icon: 'i-lucide-shopping-bag',
-    to: '/admin/product'
+    defaultOpen: true,
+    children: [
+      {
+        label: 'Listado',
+        icon: 'i-lucide-list',
+        to: '/admin/product'
+      },
+      {
+        label: 'Colores',
+        icon: 'i-lucide-palette',
+        to: '/admin/color'
+      },
+      {
+        label: 'Tallas',
+        icon: 'i-lucide-ruler',
+        to: '/admin/size'
+      }
+    ]
   },
   {
     label: 'Inventario',
@@ -30,16 +47,6 @@ const items: NavigationMenuItem[] = [
     label: 'Categorías',
     icon: 'i-lucide-tag',
     to: '/admin/category'
-  },
-  {
-    label: 'Colores',
-    icon: 'i-lucide-palette',
-    to: '/admin/color'
-  },
-  {
-    label: 'Tallas',
-    icon: 'i-lucide-ruler',
-    to: '/admin/size'
   },
   {
     label: 'Colecciones',

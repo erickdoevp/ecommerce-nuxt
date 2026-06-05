@@ -10,10 +10,13 @@ import type { ColorAdded } from './AddColorModal.vue'
 import type { SizeAdded } from './AddSizeModal.vue'
 import type { ExpandedState } from '@tanstack/vue-table'
 import { useProductForm } from '../composables/useProductForm'
+import VariantInventorySlideover from '~/features/inventory/components/VariantInventorySlideover.vue'
+import EditVariantValuesSlideover from './EditVariantValuesSlideover.vue'
 
 const props = defineProps<{
   iva?: number
   showSku?: boolean
+  readonly?: boolean
   selectSizes: SelectOption[]
   selectColors: SelectOption[]
 }>()
@@ -151,6 +154,40 @@ function updateVariant(id: string, field: keyof VariantEditable, value: any): vo
 
 function deleteVariant(id: string): void {
   variantGrid.value = variantGrid.value.filter(r => r.id !== id)
+}
+
+// ─── Row actions (edit mode) ──────────────────────────────────────────────────
+
+const showStockSlideover = ref(false)
+const stockVariantId = ref<string | null>(null)
+
+function openStockEditor(id: string): void {
+  stockVariantId.value = id
+  showStockSlideover.value = true
+}
+
+const showValuesSlideover = ref(false)
+const valuesVariantId = ref<string | null>(null)
+
+function openValuesEditor(id: string): void {
+  valuesVariantId.value = id
+  showValuesSlideover.value = true
+}
+
+function onValuesUpdated(payload: { id: string, sku: string, costPrice: number, priceAdjustment: number, image: string | null }): void {
+  updateVariant(payload.id, 'sku', payload.sku)
+  updateVariant(payload.id, 'costPrice', payload.costPrice)
+  updateVariant(payload.id, 'adjustAmount', payload.priceAdjustment)
+  updateVariant(payload.id, 'image', payload.image)
+}
+
+function rowActions(id: string) {
+  return [[
+    { label: 'Editar stock', icon: 'i-lucide-boxes', onSelect: () => openStockEditor(id) },
+    { label: 'Editar variante', icon: 'i-lucide-pencil', onSelect: () => openValuesEditor(id) }
+  ], [
+    { label: 'Eliminar', icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: () => deleteVariant(id) }
+  ]]
 }
 
 function addVariantSize(color: string, colorId: string, size: string): void {
@@ -693,7 +730,28 @@ const columns = computed(() => [
           <!-- ── Image cell (child only) ── -->
           <template #image-cell="{ row }">
             <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
-              <div class="relative group w-12 h-12">
+              <!-- Read-only image (edit mode) -->
+              <template v-if="readonly">
+                <img
+                  v-if="getVariant((row.original as VariantGridRow).id).image"
+                  :src="getVariant((row.original as VariantGridRow).id).image!"
+                  class="w-12 h-12 rounded-md object-cover border border-gray-200"
+                >
+                <div
+                  v-else
+                  class="w-12 h-12 rounded-md border border-gray-200 bg-gray-50 flex items-center justify-center"
+                >
+                  <UIcon
+                    name="i-lucide-image"
+                    class="w-5 h-5 text-gray-300"
+                  />
+                </div>
+              </template>
+
+              <div
+                v-else
+                class="relative group w-12 h-12"
+              >
                 <button
                   v-if="!getVariant((row.original as VariantGridRow).id).image"
                   type="button"
@@ -760,7 +818,14 @@ const columns = computed(() => [
           <!-- ── Cost price cell (child only) ── -->
           <template #costPrice-cell="{ row }">
             <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span
+                v-if="readonly"
+                class="text-sm text-gray-700 whitespace-nowrap"
+              >
+                {{ formatCLP(getVariant((row.original as VariantGridRow).id).costPrice ?? 0) }}
+              </span>
               <UInput
+                v-else
                 :model-value="getVariant((row.original as VariantGridRow).id).costPrice ?? 0"
                 type="number"
                 size="sm"
@@ -778,7 +843,14 @@ const columns = computed(() => [
           <!-- ── Price adjust cell (child only) ── -->
           <template #priceAdjust-cell="{ row }">
             <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span
+                v-if="readonly"
+                class="text-sm text-gray-700 whitespace-nowrap"
+              >
+                {{ formatCLP(getAdjustAmount((row.original as VariantGridRow).id)) }}
+              </span>
               <UInput
+                v-else
                 :model-value="getAdjustAmount((row.original as VariantGridRow).id)"
                 type="number"
                 size="sm"
@@ -825,7 +897,14 @@ const columns = computed(() => [
           <!-- ── Stock cell (child only) ── -->
           <template #initialStock-cell="{ row }">
             <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
+              <span
+                v-if="readonly"
+                class="text-sm text-gray-700 tabular-nums"
+              >
+                {{ getVariant((row.original as VariantGridRow).id).initialStock ?? 0 }}
+              </span>
               <UInputNumber
+                v-else
                 :model-value="getVariant((row.original as VariantGridRow).id).initialStock ?? 0"
                 size="sm"
                 :min="0"
@@ -840,7 +919,9 @@ const columns = computed(() => [
           <template #actions-cell="{ row }">
             <template v-if="!(row.original as AnyRow).isParent && !(row.original as AddSizeRow).isAddRow">
               <UDropdownMenu
-                :items="[[{ label: 'Eliminar', icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: () => deleteVariant((row.original as VariantGridRow).id) }]]"
+                :items="readonly
+                  ? rowActions((row.original as VariantGridRow).id)
+                  : [[{ label: 'Eliminar', icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: () => deleteVariant((row.original as VariantGridRow).id) }]]"
               >
                 <UButton
                   icon="i-lucide-ellipsis-vertical"
@@ -920,5 +1001,18 @@ const columns = computed(() => [
         </UButton>
       </template>
     </UModal>
+
+    <!-- Stock editor (edit mode) -->
+    <VariantInventorySlideover
+      v-model:open="showStockSlideover"
+      :variant-id="stockVariantId"
+    />
+
+    <!-- Values editor (edit mode) -->
+    <EditVariantValuesSlideover
+      v-model:open="showValuesSlideover"
+      :variant-id="valuesVariantId"
+      @updated="onValuesUpdated"
+    />
   </div>
 </template>

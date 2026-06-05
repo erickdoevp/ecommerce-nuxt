@@ -4,7 +4,9 @@ import type { Content } from '../types/product-search'
 import type { ProductFilters } from './ProductFiltersForm.vue'
 import { usePaginatedProductSearch } from '../composables/usePaginatedProductSearch'
 import ProductFiltersForm from './ProductFiltersForm.vue'
-import ProductPreviewModal from './ProductPreviewModal.vue'
+import ProductPreviewSlideover from './ProductPreviewSlideover.vue'
+import ProductVariantsSlideover from './ProductVariantsSlideover.vue'
+import EditProductSlideover from './EditProductSlideover.vue'
 
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
 
@@ -14,6 +16,30 @@ const showPreview = ref(false)
 function openPreview(id: string) {
   previewProductId.value = id
   showPreview.value = true
+}
+
+const variantsProductId = ref<string | null>(null)
+const showVariants = ref(false)
+
+function openVariants(id: string) {
+  variantsProductId.value = id
+  showVariants.value = true
+}
+
+const editProductId = ref<string | null>(null)
+const showEditProduct = ref(false)
+
+function openEditProduct(id: string) {
+  editProductId.value = id
+  showEditProduct.value = true
+}
+
+function rowActions(id: string) {
+  return [[
+    { label: 'Editar producto', icon: 'i-lucide-pencil', onSelect: () => openEditProduct(id) },
+    { label: 'Ver producto', icon: 'i-lucide-eye', onSelect: () => openPreview(id) },
+    { label: 'Editar variante', icon: 'i-lucide-shirt', onSelect: () => openVariants(id) }
+  ]]
 }
 
 const PAGE_SIZE = 10
@@ -120,22 +146,14 @@ const columns: TableColumn<Content>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center justify-start gap-0.5">
+          <UDropdownMenu :items="rowActions(row.original.id)">
             <UButton
               color="neutral"
               variant="ghost"
               size="sm"
-              icon="i-lucide-pencil"
-              :to="`/admin/product/${row.original.id}`"
+              icon="i-lucide-ellipsis-vertical"
             />
-            <UButton
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              icon="i-lucide-eye"
-              @click="openPreview(row.original.id)"
-            />
-          </div>
+          </UDropdownMenu>
         </template>
       </UTable>
     </div>
@@ -153,9 +171,20 @@ const columns: TableColumn<Content>[] = [
       />
     </div>
 
-    <ProductPreviewModal
+    <ProductPreviewSlideover
       v-model:open="showPreview"
       :product-id="previewProductId"
+    />
+
+    <ProductVariantsSlideover
+      v-model:open="showVariants"
+      :product-id="variantsProductId"
+    />
+
+    <EditProductSlideover
+      v-model:open="showEditProduct"
+      :product-id="editProductId"
+      @updated="load(currentPage)"
     />
   </div>
 </template>

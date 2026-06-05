@@ -50,6 +50,7 @@ onMounted(() => {
             :select-colors="selectColors"
             :select-sizes="selectSizes"
             show-sku
+            readonly
           />
         </div>
         <div class="flex flex-col gap-3 flex-1">

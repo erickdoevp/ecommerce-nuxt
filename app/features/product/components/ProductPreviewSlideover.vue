@@ -133,10 +133,9 @@ const finalPrice = computed(() => {
 </script>
 
 <template>
-  <UModal
+  <USlideover
     v-model:open="isOpen"
-    size="4xl"
-    :ui="{ footer: 'justify-between items-center' }"
+    :ui="{ content: 'max-w-3xl', footer: 'justify-between items-center' }"
   >
     <template #header>
       <p class="text-sm font-semibold text-gray-800">
@@ -329,5 +328,5 @@ const finalPrice = computed(() => {
         Cerrar
       </UButton>
     </template>
-  </UModal>
+  </USlideover>
 </template>
