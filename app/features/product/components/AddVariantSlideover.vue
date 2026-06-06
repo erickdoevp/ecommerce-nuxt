@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 const { getColors, selectColors } = useListColor()
 const { getSizes, selectSizes } = useListSize()
-const { createVariant, isSaving, error: saveError } = useCreateVariant()
+const { createVariant, isSaving } = useCreateVariant()
 
 const schema = z.object({
   colorId: z.string().min(1, 'Selecciona un color'),
@@ -338,12 +338,6 @@ async function onSave() {
 
     <template #footer="{ close }">
       <div class="flex items-center justify-end gap-3 w-full">
-        <p
-          v-if="saveError"
-          class="text-xs text-red-500 mr-auto"
-        >
-          {{ saveError }}
-        </p>
         <UButton
           color="neutral"
           variant="ghost"

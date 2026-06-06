@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { ProductVariantListItem } from '../types/product-variant-list'
 import { usePaginatedProductVariants } from '../composables/usePaginatedProductVariants'
 import EditVariantSlideover from './EditVariantSlideover.vue'
+import AddVariantSlideover from './AddVariantSlideover.vue'
 
 const props = defineProps<{
   productId: string | null
@@ -16,6 +17,8 @@ const { searchVariants, variants, isLoading, totalElements } = usePaginatedProdu
 
 const editVariantId = ref<string | null>(null)
 const showEditVariant = ref(false)
+
+const showAddVariant = ref(false)
 
 function openEditVariant(id: string) {
   editVariantId.value = id
@@ -173,6 +176,18 @@ const columns: TableColumn<ProductVariantListItem>[] = [
       </UTable>
     </div>
 
+    <div>
+      <UButton
+        color="neutral"
+        variant="outline"
+        size="sm"
+        icon="i-lucide-plus"
+        @click="showAddVariant = true"
+      >
+        Agregar variante
+      </UButton>
+    </div>
+
     <div class="flex items-center justify-between px-1">
       <p class="text-sm text-gray-500">
         <span class="font-medium text-gray-700">{{ totalElements }}</span> variantes en total
@@ -190,6 +205,12 @@ const columns: TableColumn<ProductVariantListItem>[] = [
       v-model:open="showEditVariant"
       :variant-id="editVariantId"
       @updated="load(currentPage)"
+    />
+
+    <AddVariantSlideover
+      v-model:open="showAddVariant"
+      :product-id="productId"
+      @created="load(currentPage)"
     />
   </div>
 </template>
