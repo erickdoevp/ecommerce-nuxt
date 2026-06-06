@@ -44,6 +44,10 @@ async function load(page: number) {
   await searchVariants(props.productId, page - 1, PAGE_SIZE)
 }
 
+defineExpose({
+  reload: () => load(currentPage.value)
+})
+
 function formatPrice(n: number): string {
   return '$ ' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }

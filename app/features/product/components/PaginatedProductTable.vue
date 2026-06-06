@@ -6,9 +6,11 @@ import { usePaginatedProductSearch } from '../composables/usePaginatedProductSea
 import ProductFiltersForm from './ProductFiltersForm.vue'
 import ProductPreviewSlideover from './ProductPreviewSlideover.vue'
 import EditProductSlideover from './EditProductSlideover.vue'
+import AddVariantSlideover from './AddVariantSlideover.vue'
 
 const emit = defineEmits<{
   'view-variants': [id: string]
+  'variant-created': [id: string]
 }>()
 
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
@@ -33,11 +35,20 @@ function openEditProduct(id: string) {
   showEditProduct.value = true
 }
 
+const addVariantProductId = ref<string | null>(null)
+const showAddVariant = ref(false)
+
+function openAddVariant(id: string) {
+  addVariantProductId.value = id
+  showAddVariant.value = true
+}
+
 function rowActions(id: string) {
   return [[
     { label: 'Editar producto', icon: 'i-lucide-pencil', onSelect: () => openEditProduct(id) },
     { label: 'Ver producto', icon: 'i-lucide-eye', onSelect: () => openPreview(id) },
-    { label: 'Ver variantes', icon: 'i-lucide-shirt', onSelect: () => openVariants(id) }
+    { label: 'Ver variantes', icon: 'i-lucide-shirt', onSelect: () => openVariants(id) },
+    { label: 'Agregar variante', icon: 'i-lucide-plus', onSelect: () => openAddVariant(id) }
   ]]
 }
 
@@ -179,6 +190,12 @@ const columns: TableColumn<Content>[] = [
       v-model:open="showEditProduct"
       :product-id="editProductId"
       @updated="load(currentPage)"
+    />
+
+    <AddVariantSlideover
+      v-model:open="showAddVariant"
+      :product-id="addVariantProductId"
+      @created="addVariantProductId && emit('variant-created', addVariantProductId)"
     />
   </div>
 </template>

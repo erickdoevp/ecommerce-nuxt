@@ -6,6 +6,11 @@ import { useProductForm } from '~/features/product/composables/useProductForm'
 const { cleanProductData } = useProductForm()
 
 const variantsProductId = ref<string | null>(null)
+const variantsTableRef = ref<{ reload: () => void } | null>(null)
+
+function onVariantCreated(productId: string) {
+  if (productId === variantsProductId.value) variantsTableRef.value?.reload()
+}
 </script>
 
 <template>
@@ -28,10 +33,14 @@ const variantsProductId = ref<string | null>(null)
       </UButton>
     </div>
     <div class="bg-white p-4 rounded-md">
-      <PaginatedProductTable @view-variants="variantsProductId = $event" />
+      <PaginatedProductTable
+        @view-variants="variantsProductId = $event"
+        @variant-created="onVariantCreated"
+      />
     </div>
 
     <PaginatedProductVariantsTable
+      ref="variantsTableRef"
       :product-id="variantsProductId"
       @close="variantsProductId = null"
     />
