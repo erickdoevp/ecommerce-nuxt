@@ -40,7 +40,7 @@ export const useListCategory = () => {
       entities.value = tree
       selectCategories.value = flattenCategories(tree)
     } catch (ferror) {
-      error.value = ferror instanceof Error ? ferror.message : String(ferror)
+      error.value = extractApiError(ferror)
     } finally {
       isLoading.value = false
     }

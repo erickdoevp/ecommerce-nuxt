@@ -13,7 +13,7 @@ export const useProductVariantDetail = () => {
       const data = await api<ProductVariantDetail>(`/products/admin/variants/${variantId}`)
       entity.value = data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al cargar la variante'
+      error.value = extractApiError(err, 'Error al cargar la variante')
     } finally {
       isLoading.value = false
     }

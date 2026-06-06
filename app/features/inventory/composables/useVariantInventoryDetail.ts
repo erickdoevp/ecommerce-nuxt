@@ -15,7 +15,7 @@ export const useVariantInventoryDetail = () => {
       })
       entity.value = data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al cargar el inventario de la variante'
+      error.value = extractApiError(err, 'Error al cargar el inventario de la variante')
     } finally {
       isLoading.value = false
     }

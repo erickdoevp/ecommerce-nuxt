@@ -19,7 +19,7 @@ export const useListColor = () => {
         value: c.id
       }))
     } catch (ferror) {
-      error.value = ferror instanceof Error ? ferror.message : String(ferror)
+      error.value = extractApiError(ferror)
     } finally {
       isLoading.value = false
     }

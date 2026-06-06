@@ -15,7 +15,7 @@ export const useAdjustVariantStock = () => {
         body: payload
       })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al ajustar el stock'
+      error.value = extractApiError(err, 'Error al ajustar el stock')
       return null
     } finally {
       isSaving.value = false
@@ -32,7 +32,7 @@ export const useAdjustVariantStock = () => {
         body: payload
       })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al actualizar el stock'
+      error.value = extractApiError(err, 'Error al actualizar el stock')
       return null
     } finally {
       isSaving.value = false

@@ -31,7 +31,7 @@ export const useCreateCategory = () => {
       }
       await api('/categories', { method: 'POST', body: payload })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al crear la categoría'
+      error.value = extractApiError(err, 'Error al crear la categoría')
       throw err
     } finally {
       isLoading.value = false

@@ -15,7 +15,7 @@ export const usePaginatedProductVariants = () => {
         { method: 'GET', query: { page, size, sort: 'sku,asc' } }
       )
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al cargar las variantes'
+      error.value = extractApiError(err, 'Error al cargar las variantes')
     } finally {
       isLoading.value = false
     }

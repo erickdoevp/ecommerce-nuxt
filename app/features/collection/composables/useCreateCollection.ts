@@ -10,7 +10,7 @@ export const useCreateCollection = () => {
       const api = createAdminApi()
       await api('/collections', { method: 'POST', body: formData })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al crear la colección'
+      error.value = extractApiError(err, 'Error al crear la colección')
     } finally {
       isLoading.value = false
     }

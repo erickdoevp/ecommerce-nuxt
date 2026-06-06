@@ -24,7 +24,7 @@ export const usePaginatedInventoryMovements = () => {
         }
       })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al cargar los movimientos de inventario'
+      error.value = extractApiError(err, 'Error al cargar los movimientos de inventario')
     } finally {
       isLoading.value = false
     }

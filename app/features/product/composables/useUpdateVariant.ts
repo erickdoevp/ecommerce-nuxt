@@ -25,7 +25,7 @@ export const useUpdateVariant = () => {
         body: formData
       })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al actualizar la variante'
+      error.value = extractApiError(err, 'Error al actualizar la variante')
       return null
     } finally {
       isSaving.value = false

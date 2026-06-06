@@ -40,18 +40,18 @@ const items: NavigationMenuItem[] = [
         label: 'Movimientos',
         icon: 'i-lucide-arrow-left-right',
         to: '/admin/inventory/movements'
+      },
+      {
+        label: 'Categorías',
+        icon: 'i-lucide-tag',
+        to: '/admin/category'
+      },
+      {
+        label: 'Colecciones',
+        icon: 'i-lucide-layers',
+        to: '/admin/collection'
       }
     ]
-  },
-  {
-    label: 'Categorías',
-    icon: 'i-lucide-tag',
-    to: '/admin/category'
-  },
-  {
-    label: 'Colecciones',
-    icon: 'i-lucide-layers',
-    to: '/admin/collection'
   },
   {
     label: 'Operaciones',

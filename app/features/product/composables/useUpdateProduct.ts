@@ -15,7 +15,7 @@ export const useUpdateProduct = () => {
         body: data
       })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al actualizar el producto'
+      error.value = extractApiError(err, 'Error al actualizar el producto')
       return null
     } finally {
       isSaving.value = false

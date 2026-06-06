@@ -20,7 +20,7 @@ export const useListSize = () => {
         value: c.id
       }))
     } catch (ferror) {
-      error.value = ferror instanceof Error ? ferror.message : String(ferror)
+      error.value = extractApiError(ferror)
     }
   }
 

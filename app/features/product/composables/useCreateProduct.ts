@@ -16,7 +16,7 @@ export const useCreateProduct = () => {
     } catch (err) {
       console.log(err)
 
-      error.value = 'Error creating product'
+      error.value = extractApiError(err, 'Error al crear el producto')
     } finally {
       isLoading.value = false
     }
