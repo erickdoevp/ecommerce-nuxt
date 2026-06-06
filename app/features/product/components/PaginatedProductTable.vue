@@ -5,8 +5,11 @@ import type { ProductFilters } from './ProductFiltersForm.vue'
 import { usePaginatedProductSearch } from '../composables/usePaginatedProductSearch'
 import ProductFiltersForm from './ProductFiltersForm.vue'
 import ProductPreviewSlideover from './ProductPreviewSlideover.vue'
-import ProductVariantsSlideover from './ProductVariantsSlideover.vue'
 import EditProductSlideover from './EditProductSlideover.vue'
+
+const emit = defineEmits<{
+  'view-variants': [id: string]
+}>()
 
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
 
@@ -18,12 +21,8 @@ function openPreview(id: string) {
   showPreview.value = true
 }
 
-const variantsProductId = ref<string | null>(null)
-const showVariants = ref(false)
-
 function openVariants(id: string) {
-  variantsProductId.value = id
-  showVariants.value = true
+  emit('view-variants', id)
 }
 
 const editProductId = ref<string | null>(null)
@@ -38,7 +37,7 @@ function rowActions(id: string) {
   return [[
     { label: 'Editar producto', icon: 'i-lucide-pencil', onSelect: () => openEditProduct(id) },
     { label: 'Ver producto', icon: 'i-lucide-eye', onSelect: () => openPreview(id) },
-    { label: 'Editar variante', icon: 'i-lucide-shirt', onSelect: () => openVariants(id) }
+    { label: 'Ver variantes', icon: 'i-lucide-shirt', onSelect: () => openVariants(id) }
   ]]
 }
 
@@ -174,11 +173,6 @@ const columns: TableColumn<Content>[] = [
     <ProductPreviewSlideover
       v-model:open="showPreview"
       :product-id="previewProductId"
-    />
-
-    <ProductVariantsSlideover
-      v-model:open="showVariants"
-      :product-id="variantsProductId"
     />
 
     <EditProductSlideover

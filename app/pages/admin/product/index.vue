@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import PaginatedProductTable from '~/features/product/components/PaginatedProductTable.vue'
+import PaginatedProductVariantsTable from '~/features/product/components/PaginatedProductVariantsTable.vue'
 import { useProductForm } from '~/features/product/composables/useProductForm'
 
 const { cleanProductData } = useProductForm()
+
+const variantsProductId = ref<string | null>(null)
 </script>
 
 <template>
@@ -25,8 +28,13 @@ const { cleanProductData } = useProductForm()
       </UButton>
     </div>
     <div class="bg-white p-4 rounded-md">
-      <PaginatedProductTable />
+      <PaginatedProductTable @view-variants="variantsProductId = $event" />
     </div>
+
+    <PaginatedProductVariantsTable
+      :product-id="variantsProductId"
+      @close="variantsProductId = null"
+    />
   </div>
 </template>
 

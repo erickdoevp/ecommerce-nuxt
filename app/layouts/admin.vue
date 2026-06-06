@@ -30,18 +30,18 @@ const items: NavigationMenuItem[] = [
         label: 'Tallas',
         icon: 'i-lucide-ruler',
         to: '/admin/size'
+      },
+      {
+        label: 'Inventario',
+        icon: 'i-lucide-warehouse',
+        to: '/admin/inventory'
+      },
+      {
+        label: 'Movimientos',
+        icon: 'i-lucide-arrow-left-right',
+        to: '/admin/inventory/movements'
       }
     ]
-  },
-  {
-    label: 'Inventario',
-    icon: 'i-lucide-warehouse',
-    to: '/admin/inventory'
-  },
-  {
-    label: 'Movimientos',
-    icon: 'i-lucide-arrow-left-right',
-    to: '/admin/inventory/movements'
   },
   {
     label: 'Categorías',
