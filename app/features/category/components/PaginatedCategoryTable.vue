@@ -32,6 +32,13 @@ function onFiltersChange(filters: CategoryFilters) {
   load(1)
 }
 
+function rowActions(id: string) {
+  return [[
+    { label: 'Editar categoría', icon: 'i-lucide-pencil', to: `/admin/category/${id}/edit` },
+    { label: 'Ver categoría', icon: 'i-lucide-eye', to: `/admin/category/${id}` }
+  ]]
+}
+
 const columns: TableColumn<CategoryContent>[] = [
   { id: 'index', header: '#' },
   { id: 'image', header: 'Imagen' },
@@ -49,12 +56,12 @@ const columns: TableColumn<CategoryContent>[] = [
       :select-categories="selectCategories"
       @change="onFiltersChange"
     />
-    <div class="flex-1 overflow-auto border border-solid rounded-lg border-default">
+    <div class="flex-1 overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="categories"
         :columns="columns"
         :loading="isLoading"
-        class="border border-[#ececed] rounded-xl overflow-hidden"
+        class="w-full"
       >
         <template #index-cell="{ row }">
           <span class="text-xs text-gray-400 tabular-nums">
@@ -117,22 +124,14 @@ const columns: TableColumn<CategoryContent>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center justify-start gap-0.5">
+          <UDropdownMenu :items="rowActions(row.original.id)">
             <UButton
               color="neutral"
               variant="ghost"
               size="sm"
-              icon="i-lucide-pencil"
-              :to="`/admin/category/${row.original.id}/edit`"
+              icon="i-lucide-ellipsis-vertical"
             />
-            <UButton
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              icon="i-lucide-eye"
-              :to="`/admin/category/${row.original.id}`"
-            />
-          </div>
+          </UDropdownMenu>
         </template>
       </UTable>
     </div>

@@ -87,12 +87,12 @@ const columns: TableColumn<ProductVariantListItem>[] = [
       />
     </div>
 
-    <div class="flex-1 overflow-auto border border-solid rounded-lg border-default">
+    <div class="flex-1 overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="variants"
         :columns="columns"
         :loading="isLoading"
-        class="border border-[#ececed] rounded-xl overflow-hidden"
+        class="w-full"
       >
         <template #index-cell="{ row }">
           <span class="text-xs text-gray-400 tabular-nums">

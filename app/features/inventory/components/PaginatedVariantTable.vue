@@ -41,6 +41,12 @@ function formatCurrency(value: number) {
   return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value ?? 0)
 }
 
+function rowActions(variantId: string) {
+  return [[
+    { label: 'Editar stock', icon: 'i-lucide-pencil', onSelect: () => openSlideover(variantId) }
+  ]]
+}
+
 function stockMeta(row: VariantInventoryContent): { label: string, color: 'success' | 'warning' | 'error' } {
   if (row.availableStock <= 0) return { label: 'Sin stock', color: 'error' }
   if (row.lowStock) return { label: 'Stock bajo', color: 'warning' }
@@ -56,7 +62,7 @@ const columns: TableColumn<VariantInventoryContent>[] = [
   { accessorKey: 'finalPrice', header: 'Precio' },
   { id: 'stock', header: 'Stock' },
   { id: 'productStatus', header: 'Estado' },
-  { id: 'actions', header: '' }
+  { id: 'actions', header: 'Acciones' }
 ]
 </script>
 
@@ -64,12 +70,12 @@ const columns: TableColumn<VariantInventoryContent>[] = [
   <div class="space-y-3">
     <VariantFiltersForm @change="onFiltersChange" />
 
-    <div class="flex-1 overflow-auto border border-solid rounded-lg border-default">
+    <div class="flex-1 overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="variants"
         :columns="columns"
         :loading="isLoading"
-        class="border border-[#ececed] rounded-xl overflow-hidden"
+        class="w-full"
       >
         <template #index-cell="{ row }">
           <span class="text-xs text-gray-400 tabular-nums">
@@ -151,14 +157,14 @@ const columns: TableColumn<VariantInventoryContent>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <UButton
-            icon="i-lucide-pencil"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            aria-label="Editar stock"
-            @click="openSlideover(row.original.variantId)"
-          />
+          <UDropdownMenu :items="rowActions(row.original.variantId)">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              icon="i-lucide-ellipsis-vertical"
+            />
+          </UDropdownMenu>
         </template>
       </UTable>
     </div>

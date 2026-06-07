@@ -51,6 +51,13 @@ function openView(color: ColorContent) {
 
 defineExpose({ openAdd })
 
+function rowActions(color: ColorContent) {
+  return [[
+    { label: 'Editar color', icon: 'i-lucide-pencil', onSelect: () => openEdit(color) },
+    { label: 'Ver color', icon: 'i-lucide-eye', onSelect: () => openView(color) }
+  ]]
+}
+
 const columns: TableColumn<ColorContent>[] = [
   { id: 'index', header: '#' },
   { id: 'swatch', header: 'Muestra' },
@@ -70,7 +77,7 @@ const columns: TableColumn<ColorContent>[] = [
       class="w-64"
     />
 
-    <div class="overflow-auto border border-solid rounded-lg border-default">
+    <div class="overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="colors"
         :columns="columns"
@@ -98,22 +105,14 @@ const columns: TableColumn<ColorContent>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center gap-0.5">
+          <UDropdownMenu :items="rowActions(row.original)">
             <UButton
               color="neutral"
               variant="ghost"
               size="sm"
-              icon="i-lucide-pencil"
-              @click="openEdit(row.original)"
+              icon="i-lucide-ellipsis-vertical"
             />
-            <UButton
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              icon="i-lucide-eye"
-              @click="openView(row.original)"
-            />
-          </div>
+          </UDropdownMenu>
         </template>
       </UTable>
     </div>

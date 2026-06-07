@@ -53,6 +53,13 @@ const activeOptions = [
   { label: 'Inactivas', value: false }
 ]
 
+function rowActions(collection: CollectionContent) {
+  return [[
+    { label: 'Editar colección', icon: 'i-lucide-pencil', onSelect: () => openEdit(collection) },
+    { label: 'Ver colección', icon: 'i-lucide-eye', onSelect: () => openView(collection) }
+  ]]
+}
+
 const columns: TableColumn<CollectionContent>[] = [
   { id: 'index', header: '#' },
   { id: 'image', header: 'Imagen' },
@@ -86,7 +93,7 @@ const columns: TableColumn<CollectionContent>[] = [
       />
     </div>
 
-    <div class="overflow-auto border border-solid rounded-lg border-default">
+    <div class="overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="collections"
         :columns="columns"
@@ -143,22 +150,14 @@ const columns: TableColumn<CollectionContent>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center gap-0.5">
+          <UDropdownMenu :items="rowActions(row.original)">
             <UButton
               color="neutral"
               variant="ghost"
               size="sm"
-              icon="i-lucide-pencil"
-              @click="openEdit(row.original)"
+              icon="i-lucide-ellipsis-vertical"
             />
-            <UButton
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              icon="i-lucide-eye"
-              @click="openView(row.original)"
-            />
-          </div>
+          </UDropdownMenu>
         </template>
       </UTable>
     </div>

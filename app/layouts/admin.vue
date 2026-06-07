@@ -94,14 +94,8 @@ const initials = computed(() => {
       }"
     >
       <template #header>
-        <!-- <img
-          src="/images/main-logo.png"
-          alt="Cefire Fisioterapia logo"
-          width="30"
-          height="30"
-        > -->
         <p class="text-black font-semibold tracking-wide flex-1 overflow-hidden">
-          CEFIRE
+          My Ecommerce
         </p>
         <UBadge
           label="Admin"

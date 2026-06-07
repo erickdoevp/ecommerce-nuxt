@@ -48,12 +48,12 @@ const columns: TableColumn<Content>[] = [
   <div class="space-y-3">
     <MovementFiltersForm @change="onFiltersChange" />
 
-    <div class="flex-1 overflow-auto border border-solid rounded-lg border-default">
+    <div class="flex-1 overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="movements"
         :columns="columns"
         :loading="isLoading"
-        class="border border-[#ececed] rounded-xl overflow-hidden"
+        class="w-full"
       >
         <template #index-cell="{ row }">
           <span class="text-xs text-gray-400 tabular-nums">

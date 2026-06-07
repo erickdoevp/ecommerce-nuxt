@@ -51,6 +51,13 @@ function openView(size: SizeContent) {
 
 defineExpose({ openAdd })
 
+function rowActions(size: SizeContent) {
+  return [[
+    { label: 'Editar talla', icon: 'i-lucide-pencil', onSelect: () => openEdit(size) },
+    { label: 'Ver talla', icon: 'i-lucide-eye', onSelect: () => openView(size) }
+  ]]
+}
+
 const columns: TableColumn<SizeContent>[] = [
   { id: 'index', header: '#' },
   { accessorKey: 'name', header: 'Nombre' },
@@ -69,7 +76,7 @@ const columns: TableColumn<SizeContent>[] = [
       class="w-64"
     />
 
-    <div class="overflow-auto border border-solid rounded-lg border-default">
+    <div class="overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
       <UTable
         :data="sizes"
         :columns="columns"
@@ -90,22 +97,14 @@ const columns: TableColumn<SizeContent>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center gap-0.5">
+          <UDropdownMenu :items="rowActions(row.original)">
             <UButton
               color="neutral"
               variant="ghost"
               size="sm"
-              icon="i-lucide-pencil"
-              @click="openEdit(row.original)"
+              icon="i-lucide-ellipsis-vertical"
             />
-            <UButton
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              icon="i-lucide-eye"
-              @click="openView(row.original)"
-            />
-          </div>
+          </UDropdownMenu>
         </template>
       </UTable>
     </div>

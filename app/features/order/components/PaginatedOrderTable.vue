@@ -68,6 +68,12 @@ function itemsCount(order: OrderContent) {
   return order.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
 }
 
+function rowActions(row: TableRow<OrderContent>) {
+  return [[
+    { label: 'Ver pedido', icon: 'i-lucide-eye', onSelect: () => selectRow(new Event('select'), row) }
+  ]]
+}
+
 const columns: TableColumn<OrderContent>[] = [
   { id: 'index', header: '#' },
   { accessorKey: 'orderNumber', header: 'Pedido' },
@@ -85,13 +91,13 @@ const columns: TableColumn<OrderContent>[] = [
 
     <div class="flex items-start gap-4">
       <div class="flex-1 min-w-0 space-y-3">
-        <div class="flex-1 overflow-auto border border-solid rounded-lg border-default">
+        <div class="flex-1 overflow-auto max-h-[70vh] border border-solid rounded-lg border-default">
           <UTable
             ref="ordersTable"
             :data="orders"
             :columns="columns"
             :loading="isLoading"
-            class="border border-[#ececed] rounded-xl overflow-hidden"
+            class="w-full"
             @select="selectRow"
           >
             <template #index-cell="{ row }">
@@ -129,15 +135,14 @@ const columns: TableColumn<OrderContent>[] = [
             </template>
 
             <template #actions-cell="{ row }">
-              <div class="flex items-center justify-start gap-0.5">
+              <UDropdownMenu :items="rowActions(row)">
                 <UButton
                   color="neutral"
                   variant="ghost"
                   size="sm"
-                  icon="i-lucide-eye"
-                  @click="selectRow($event, row)"
+                  icon="i-lucide-ellipsis-vertical"
                 />
-              </div>
+              </UDropdownMenu>
             </template>
           </UTable>
         </div>
