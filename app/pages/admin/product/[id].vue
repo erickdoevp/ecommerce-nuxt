@@ -6,6 +6,7 @@ import ProductState from '~/features/product/components/ProductState.vue'
 import ProductVariantsCard from '~/features/product/components/ProductVariantsCard.vue'
 import { useListColor } from '~/features/product/composables/useListColor'
 import { useListSize } from '~/features/product/composables/useListSize'
+import { useListTax } from '~/features/product/composables/useListTax'
 import { useProductDetail } from '~/features/product/composables/useProductDetail'
 
 const route = useRoute()
@@ -14,12 +15,14 @@ const id = String(route.params.id)
 const { getProductById } = useProductDetail()
 const { getSizes, selectSizes } = useListSize()
 const { getColors, selectColors } = useListColor()
+const { getTaxConfigs, selectTax } = useListTax()
 const { getCategories, treeSelectCategory } = useTreeCategory()
 
 onMounted(() => {
   getProductById(id)
   getSizes()
   getColors()
+  getTaxConfigs()
   getCategories()
 })
 </script>
@@ -42,6 +45,7 @@ onMounted(() => {
             :select-categories="treeSelectCategory"
             :select-sizes="selectSizes"
             :select-colors="selectColors"
+            :select-tax="selectTax"
           />
 
           <ProductMediaCard />

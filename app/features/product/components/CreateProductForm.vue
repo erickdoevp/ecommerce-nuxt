@@ -8,9 +8,16 @@ defineProps<{
   selectSizes: SelectOption[]
   selectColors: SelectOption[]
   selectCategories: CategoryOption[]
+  selectTax: SelectOption[]
 }>()
 
 const { form, wordCount } = useProductForm()
+
+const formRef = ref()
+
+defineExpose({
+  validate: () => formRef.value?.validate()
+})
 
 function toSlug(text: string): string {
   return text
@@ -68,6 +75,7 @@ const toolbarItems = [
 <template>
   <div class="space-y-4">
     <UForm
+      ref="formRef"
       :schema="productSchema"
       :state="form"
       class="grid grid-cols-2 gap-4 items-start"
@@ -149,6 +157,20 @@ const toolbarItems = [
               </USelectMenu>
             </UFormField>
           </div>
+
+          <UFormField
+            label="Tipo de IVA"
+            name="taxConfigId"
+            class="w-full"
+          >
+            <USelectMenu
+              v-model="form.taxConfigId"
+              :items="selectTax"
+              value-key="value"
+              placeholder="Selecciona un tipo de IVA"
+              class="w-full"
+            />
+          </UFormField>
 
           <UFormField
             label="Descripción"

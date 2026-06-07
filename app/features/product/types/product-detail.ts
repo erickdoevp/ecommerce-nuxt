@@ -10,6 +10,9 @@ export interface ProductDetail {
   reviewCount: number
   slug: string
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+  taxConfigId: string | null
+  taxName: string | null
+  taxRate: number | null
   updatedAt: Date
   variants: Variant[]
 }

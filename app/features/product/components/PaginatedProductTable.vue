@@ -8,7 +8,7 @@ import ProductPreviewSlideover from './ProductPreviewSlideover.vue'
 import EditProductSlideover from './EditProductSlideover.vue'
 
 const emit = defineEmits<{
-  'view-variants': [id: string]
+  'view-variants': [id: string, basePrice: number]
 }>()
 
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
@@ -21,8 +21,8 @@ function openPreview(id: string) {
   showPreview.value = true
 }
 
-function openVariants(id: string) {
-  emit('view-variants', id)
+function openVariants(id: string, basePrice: number) {
+  emit('view-variants', id, basePrice)
 }
 
 const editProductId = ref<string | null>(null)
@@ -33,11 +33,11 @@ function openEditProduct(id: string) {
   showEditProduct.value = true
 }
 
-function rowActions(id: string) {
+function rowActions(product: Content) {
   return [[
-    { label: 'Editar producto', icon: 'i-lucide-pencil', onSelect: () => openEditProduct(id) },
-    { label: 'Ver producto', icon: 'i-lucide-eye', onSelect: () => openPreview(id) },
-    { label: 'Ver variantes', icon: 'i-lucide-shirt', onSelect: () => openVariants(id) }
+    { label: 'Editar producto', icon: 'i-lucide-pencil', onSelect: () => openEditProduct(product.id) },
+    { label: 'Ver producto', icon: 'i-lucide-eye', onSelect: () => openPreview(product.id) },
+    { label: 'Ver variantes', icon: 'i-lucide-shirt', onSelect: () => openVariants(product.id, product.basePrice) }
   ]]
 }
 
@@ -145,7 +145,7 @@ const columns: TableColumn<Content>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <UDropdownMenu :items="rowActions(row.original.id)">
+          <UDropdownMenu :items="rowActions(row.original)">
             <UButton
               color="neutral"
               variant="ghost"

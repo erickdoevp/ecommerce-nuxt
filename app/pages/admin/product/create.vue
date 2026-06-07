@@ -7,15 +7,25 @@ import ProductVariantsCard from '~/features/product/components/ProductVariantsCa
 import { useCreateProduct } from '~/features/product/composables/useCreateProduct'
 import { useListColor } from '~/features/product/composables/useListColor'
 import { useListSize } from '~/features/product/composables/useListSize'
+import { useListTax } from '~/features/product/composables/useListTax'
 import { useProductForm } from '~/features/product/composables/useProductForm'
 
 const { getSizes, selectSizes } = useListSize()
 const { getColors, selectColors } = useListColor()
+const { getTaxConfigs, selectTax } = useListTax()
 const { getCategories, treeSelectCategory } = useTreeCategory()
 const { form, images, variantGrid, variantData } = useProductForm()
 const { createProduct } = useCreateProduct()
 
-function onSave(): void {
+const productFormRef = useTemplateRef('productFormRef')
+
+async function onSave(): Promise<void> {
+  try {
+    await productFormRef.value?.validate()
+  } catch {
+    return
+  }
+
   const variants = variantGrid.value.map((row) => {
     const v = variantData.value[row.id] ?? {}
     return {
@@ -32,6 +42,7 @@ function onSave(): void {
     slug: form.slug,
     basePrice: form.basePrice,
     categoryId: form.categoryId,
+    taxConfigId: form.taxConfigId,
     description: form.description,
     status: form.status,
     variants
@@ -41,7 +52,9 @@ function onSave(): void {
   const formData = new FormData()
   formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }))
   for (const img of images.value) {
-    formData.append('images', img.editedBlob ?? img.file, img.file.name)
+    const blob = img.editedBlob ?? img.file
+    if (!blob) continue
+    formData.append('images', blob, img.file?.name ?? 'image.jpg')
   }
   for (let i = 0; i < variantGrid.value.length; i++) {
     const v = variantData.value[variantGrid.value[i]!.id] ?? {}
@@ -56,6 +69,7 @@ function onSave(): void {
 onMounted(() => {
   getColors()
   getSizes()
+  getTaxConfigs()
   getCategories()
 })
 </script>
@@ -74,9 +88,11 @@ onMounted(() => {
       <div class="flex flex-row gap-3">
         <div class="flex flex-col gap-3 w-[70%]">
           <CreateProductForm
+            ref="productFormRef"
             :select-categories="treeSelectCategory"
             :select-sizes="selectSizes"
             :select-colors="selectColors"
+            :select-tax="selectTax"
           />
 
           <ProductMediaCard />

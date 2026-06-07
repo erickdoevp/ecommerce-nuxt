@@ -8,6 +8,9 @@ export interface ProductVariantListItem {
   imageUrl: string
   active: boolean
   availableStock: number
+  taxConfigId: string | null
+  taxName: string | null
+  taxRate: number | null
 }
 
 export interface ProductVariantListPage {

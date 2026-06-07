@@ -9,6 +9,7 @@ const product = reactive<ProductSchema>({
   slug: '',
   basePrice: 0,
   categoryId: '',
+  taxConfigId: '',
   description: '',
   status: 'DRAFT'
 })
@@ -28,6 +29,7 @@ export const useProductForm = () => {
     product.slug = productData.slug
     product.basePrice = productData.basePrice
     product.categoryId = productData.category.id
+    product.taxConfigId = productData.taxConfigId ?? ''
     product.description = productData.description
     product.status = productData.status
 
@@ -68,6 +70,7 @@ export const useProductForm = () => {
     product.slug = ''
     product.basePrice = 0
     product.categoryId = ''
+    product.taxConfigId = ''
     product.description = ''
     product.status = 'DRAFT'
     images.value = []

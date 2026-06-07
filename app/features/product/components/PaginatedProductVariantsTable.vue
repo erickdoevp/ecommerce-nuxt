@@ -7,6 +7,7 @@ import AddVariantSlideover from './AddVariantSlideover.vue'
 
 const props = defineProps<{
   productId: string | null
+  basePrice?: number
 }>()
 
 const emit = defineEmits<{
@@ -55,6 +56,10 @@ function formatPrice(n: number): string {
   return '$ ' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+function profit(item: ProductVariantListItem): number {
+  return (props.basePrice ?? 0) + item.priceAdjustment - item.costPrice
+}
+
 const columns: TableColumn<ProductVariantListItem>[] = [
   { id: 'index', header: '#' },
   { id: 'image', header: 'Imagen' },
@@ -63,6 +68,7 @@ const columns: TableColumn<ProductVariantListItem>[] = [
   { accessorKey: 'size', header: 'Talla' },
   { accessorKey: 'priceAdjustment', header: 'Ajuste de precio' },
   { accessorKey: 'costPrice', header: 'Costo' },
+  { id: 'profit', header: 'Ganancia' },
   { accessorKey: 'availableStock', header: 'Stock disponible' },
   { accessorKey: 'active', header: 'Estado' },
   { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
@@ -142,6 +148,15 @@ const columns: TableColumn<ProductVariantListItem>[] = [
 
         <template #costPrice-cell="{ row }">
           <span class="text-sm text-gray-600">{{ formatPrice(row.original.costPrice) }}</span>
+        </template>
+
+        <template #profit-cell="{ row }">
+          <span
+            class="text-sm font-medium"
+            :class="profit(row.original) >= 0 ? 'text-green-600' : 'text-red-500'"
+          >
+            {{ formatPrice(profit(row.original)) }}
+          </span>
         </template>
 
         <template #availableStock-cell="{ row }">

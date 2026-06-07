@@ -18,5 +18,8 @@ export interface ProductVariantDetail {
   sizeName: string
   sku: string
   stock: number
+  taxConfigId: string | null
+  taxName: string | null
+  taxRate: number | null
   variantId: string
 }

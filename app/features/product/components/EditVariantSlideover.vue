@@ -143,6 +143,11 @@ const statusMeta = computed(() =>
 
 const finalPrice = computed(() => (productVariantDetail.value?.basePrice ?? 0) + (priceAdjustment.value || 0))
 
+const taxLabel = computed(() => productVariantDetail.value?.taxName ?? 'Sin IVA asignado')
+
+const profit = computed(() => finalPrice.value - (costPrice.value || 0))
+const margin = computed(() => (finalPrice.value > 0 ? (profit.value / finalPrice.value) * 100 : 0))
+
 function formatPrice(n: number): string {
   return '$ ' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
@@ -321,6 +326,52 @@ async function onSave() {
                       </template>
                       <template #trailing>
                         <span class="text-xs text-gray-400">MXN</span>
+                      </template>
+                    </UInput>
+                  </UFormField>
+
+                  <UFormField
+                    label="IVA"
+                    class="col-span-2"
+                  >
+                    <UInput
+                      :model-value="taxLabel"
+                      disabled
+                      class="w-full"
+                    >
+                      <template #leading>
+                        <UIcon
+                          name="i-lucide-receipt-text"
+                          class="w-4 h-4 text-gray-400"
+                        />
+                      </template>
+                    </UInput>
+                  </UFormField>
+
+                  <UFormField
+                    label="Ganancia estimada"
+                    class="col-span-2"
+                    help="Precio final menos el precio de costo (sin considerar IVA)."
+                  >
+                    <UInput
+                      :model-value="formatPrice(profit)"
+                      disabled
+                      class="w-full"
+                    >
+                      <template #leading>
+                        <UIcon
+                          name="i-lucide-trending-up"
+                          class="w-4 h-4"
+                          :class="profit >= 0 ? 'text-green-600' : 'text-red-500'"
+                        />
+                      </template>
+                      <template #trailing>
+                        <span
+                          class="text-xs font-medium"
+                          :class="profit >= 0 ? 'text-green-600' : 'text-red-500'"
+                        >
+                          {{ margin.toFixed(0) }}%
+                        </span>
                       </template>
                     </UInput>
                   </UFormField>

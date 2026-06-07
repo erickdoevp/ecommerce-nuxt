@@ -3,6 +3,7 @@ import { useProductDetail } from '../composables/useProductDetail'
 import { useProductForm } from '../composables/useProductForm'
 import { useUpdateProduct } from '../composables/useUpdateProduct'
 import { productUpdateSchema } from '../schemas/product-update.schema'
+import { useListTax } from '../composables/useListTax'
 import { useTreeCategory } from '~/features/category/composables/useTreeCategory'
 
 const props = defineProps<{
@@ -19,6 +20,7 @@ const { getProductById, product, isLoading } = useProductDetail()
 const { form, wordCount } = useProductForm()
 const { updateProduct, isSaving, error: saveError } = useUpdateProduct()
 const { getCategories, treeSelectCategory } = useTreeCategory()
+const { getTaxConfigs, selectTax } = useListTax()
 
 const formRef = ref()
 const isReady = ref(false)
@@ -36,6 +38,7 @@ watch([open, () => props.productId], ([isOpen, id]) => {
 
 onMounted(() => {
   if (!treeSelectCategory.value.length) getCategories()
+  if (!selectTax.value.length) getTaxConfigs()
 })
 
 const statusMeta: Record<string, { label: string, color: 'neutral' | 'success' | 'error' }> = {
@@ -98,6 +101,7 @@ async function onSave() {
     description: form.description,
     basePrice: Number(form.basePrice),
     categoryId: form.categoryId,
+    taxConfigId: form.taxConfigId,
     status: form.status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   })
 
@@ -264,6 +268,19 @@ async function onSave() {
                   <span class="text-sm text-gray-500">$</span>
                 </template>
               </UInput>
+            </UFormField>
+
+            <UFormField
+              label="Tipo de IVA"
+              name="taxConfigId"
+            >
+              <USelectMenu
+                v-model="form.taxConfigId"
+                :items="selectTax"
+                value-key="value"
+                placeholder="Selecciona un tipo de IVA"
+                class="w-full"
+              />
             </UFormField>
           </div>
 

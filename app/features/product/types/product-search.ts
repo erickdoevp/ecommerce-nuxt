@@ -26,6 +26,9 @@ export interface Content {
   reviewCount: number
   slug: string
   status: string
+  taxConfigId: string | null
+  taxName: string | null
+  taxRate: number | null
 }
 
 export interface Category {
