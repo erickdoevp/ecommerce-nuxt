@@ -62,7 +62,7 @@ const columns: TableColumn<SizeContent>[] = [
   { id: 'index', header: '#' },
   { accessorKey: 'name', header: 'Nombre' },
   { accessorKey: 'sortOrder', header: 'Orden' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 

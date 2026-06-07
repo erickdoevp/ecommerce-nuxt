@@ -62,7 +62,7 @@ const columns: TableColumn<VariantInventoryContent>[] = [
   { accessorKey: 'finalPrice', header: 'Precio' },
   { id: 'stock', header: 'Stock' },
   { id: 'productStatus', header: 'Estado' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 

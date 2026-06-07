@@ -75,7 +75,7 @@ const columns: TableColumn<Content>[] = [
   { accessorKey: 'category', header: 'Categoría' },
   { accessorKey: 'basePrice', header: 'Precio base' },
   { accessorKey: 'status', header: 'Estado' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 

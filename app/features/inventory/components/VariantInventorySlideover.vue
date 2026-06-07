@@ -96,7 +96,7 @@ const inventoryValue = computed(() => (productVariantDetail.value?.costPrice ?? 
   <USlideover
     v-model:open="open"
     title="Editar stock"
-    :ui="{ content: 'max-w-3xl' }"
+    :ui="{ content: 'max-w-xl' }"
   >
     <template #body>
       <div

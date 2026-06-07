@@ -63,7 +63,7 @@ const columns: TableColumn<ColorContent>[] = [
   { id: 'swatch', header: 'Muestra' },
   { accessorKey: 'name', header: 'Nombre' },
   { accessorKey: 'hex', header: 'Hex' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 

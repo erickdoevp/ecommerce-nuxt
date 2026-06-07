@@ -175,7 +175,7 @@ async function onSave() {
   <USlideover
     v-model:open="open"
     title="Editar variante"
-    :ui="{ content: 'max-w-lg' }"
+    :ui="{ content: 'max-w-xl' }"
   >
     <template #body>
       <div

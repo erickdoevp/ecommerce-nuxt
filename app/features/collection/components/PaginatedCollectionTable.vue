@@ -68,7 +68,7 @@ const columns: TableColumn<CollectionContent>[] = [
   { accessorKey: 'position', header: 'Posición' },
   { id: 'productCount', header: 'Productos' },
   { id: 'active', header: 'Estado' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 

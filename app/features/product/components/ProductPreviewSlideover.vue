@@ -135,7 +135,7 @@ const finalPrice = computed(() => {
 <template>
   <USlideover
     v-model:open="isOpen"
-    :ui="{ content: 'max-w-3xl', footer: 'justify-between items-center' }"
+    :ui="{ content: 'max-w-xl', footer: 'justify-between items-center' }"
   >
     <template #header>
       <p class="text-sm font-semibold text-gray-800">

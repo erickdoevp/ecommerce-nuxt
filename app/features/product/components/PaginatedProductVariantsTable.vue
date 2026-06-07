@@ -65,7 +65,7 @@ const columns: TableColumn<ProductVariantListItem>[] = [
   { accessorKey: 'costPrice', header: 'Costo' },
   { accessorKey: 'availableStock', header: 'Stock disponible' },
   { accessorKey: 'active', header: 'Estado' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 

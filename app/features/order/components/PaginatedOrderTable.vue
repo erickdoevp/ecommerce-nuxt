@@ -81,7 +81,7 @@ const columns: TableColumn<OrderContent>[] = [
   { id: 'items', header: 'Artículos' },
   { accessorKey: 'total', header: 'Total' },
   { accessorKey: 'createdAt', header: 'Fecha' },
-  { id: 'actions', header: 'Acciones' }
+  { id: 'actions', header: 'Acciones', meta: { class: { th: 'text-center', td: 'text-center' } } }
 ]
 </script>
 
