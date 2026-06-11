@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { usePaginatedCollectionSearch } from '../composables/usePaginatedCollectionSearch'
 import type { CollectionContent } from '../types/collection-search'
 import CollectionFormModal from './CollectionFormModal.vue'
+import EditCollectionSlideover from './EditCollectionSlideover.vue'
 
 const { searchCollections, collections, isLoading, totalElements } = usePaginatedCollectionSearch()
 
@@ -35,10 +36,11 @@ const modalOpen = ref(false)
 const modalMode = ref<'create' | 'edit' | 'view'>('create')
 const selectedCollection = ref<CollectionContent | undefined>()
 
+const editOpen = ref(false)
+
 function openEdit(collection: CollectionContent) {
   selectedCollection.value = collection
-  modalMode.value = 'edit'
-  modalOpen.value = true
+  editOpen.value = true
 }
 
 function openView(collection: CollectionContent) {
@@ -178,6 +180,12 @@ const columns: TableColumn<CollectionContent>[] = [
     <CollectionFormModal
       v-model:open="modalOpen"
       :mode="modalMode"
+      :collection="selectedCollection"
+      @saved="load(currentPage)"
+    />
+
+    <EditCollectionSlideover
+      v-model:open="editOpen"
       :collection="selectedCollection"
       @saved="load(currentPage)"
     />

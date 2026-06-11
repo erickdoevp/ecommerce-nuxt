@@ -4,10 +4,19 @@ import type { CategoryContent } from '../types/category-search'
 import type { CategoryFilters } from './CategoryFiltersForm.vue'
 import { usePaginatedCategorySearch } from '../composables/usePaginatedCategorySearch'
 import CategoryFiltersForm from './CategoryFiltersForm.vue'
+import EditCategorySlideover from './EditCategorySlideover.vue'
 import { useListCategory } from '../composables/useListCategory'
 
 const { searchCategories, categories, isLoading, totalElements } = usePaginatedCategorySearch()
 const { selectCategories, getCategories } = useListCategory()
+
+const editOpen = ref(false)
+const selectedCategory = ref<CategoryContent | undefined>()
+
+function openEdit(category: CategoryContent) {
+  selectedCategory.value = category
+  editOpen.value = true
+}
 
 const PAGE_SIZE = 10
 const currentPage = ref(1)
@@ -32,10 +41,10 @@ function onFiltersChange(filters: CategoryFilters) {
   load(1)
 }
 
-function rowActions(id: string) {
+function rowActions(category: CategoryContent) {
   return [[
-    { label: 'Editar categoría', icon: 'i-lucide-pencil', to: `/admin/category/${id}/edit` },
-    { label: 'Ver categoría', icon: 'i-lucide-eye', to: `/admin/category/${id}` }
+    { label: 'Editar categoría', icon: 'i-lucide-pencil', onSelect: () => openEdit(category) },
+    { label: 'Ver categoría', icon: 'i-lucide-eye', to: `/admin/category/${category.id}` }
   ]]
 }
 
@@ -124,7 +133,7 @@ const columns: TableColumn<CategoryContent>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <UDropdownMenu :items="rowActions(row.original.id)">
+          <UDropdownMenu :items="rowActions(row.original)">
             <UButton
               color="neutral"
               variant="ghost"
@@ -148,5 +157,11 @@ const columns: TableColumn<CategoryContent>[] = [
         @update:page="load"
       />
     </div>
+
+    <EditCategorySlideover
+      v-model:open="editOpen"
+      :category="selectedCategory"
+      @saved="load(currentPage)"
+    />
   </div>
 </template>

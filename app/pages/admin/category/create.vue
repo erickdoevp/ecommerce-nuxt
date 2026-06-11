@@ -14,13 +14,22 @@ onMounted(() => getCategories())
 <template>
   <div class="page-container">
     <UContainer>
-      <div class="flex flex-col gap-1 mb-6">
-        <h1 class="text-xl font-semibold text-gray-900">
-          Nueva categoría
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5">
-          Completa los datos para agregar una nueva categoría al catálogo.
-        </p>
+      <div class="flex items-center gap-3 mb-6">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          icon="i-lucide-arrow-left"
+          to="/admin/category"
+        />
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-semibold text-gray-900">
+            Nueva categoría
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5">
+            Completa los datos para agregar una nueva categoría al catálogo.
+          </p>
+        </div>
       </div>
       <div class="flex flex-row gap-3">
         <div class="flex flex-col gap-3 w-[70%]">
