@@ -22,6 +22,7 @@ type Schema = z.output<typeof schema>
 
 const form = reactive<Schema>({ name: '', sortOrder: 1 })
 const isSaving = ref(false)
+const toast = useToast()
 
 watch(open, (val) => {
   if (val) {
@@ -45,6 +46,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     } else {
       await api(`/sizes/${props.size!.id}`, { method: 'PUT', body: event.data })
     }
+    toast.add({
+      title: props.mode === 'create' ? 'Talla creada' : 'Talla actualizada',
+      color: 'success',
+      icon: 'i-lucide-check-circle'
+    })
     emit('saved')
     open.value = false
   } catch (error) {

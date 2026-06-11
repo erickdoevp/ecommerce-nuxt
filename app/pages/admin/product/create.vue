@@ -16,6 +16,7 @@ const { getTaxConfigs, selectTax } = useListTax()
 const { getCategories, treeSelectCategory } = useTreeCategory()
 const { form, images, variantGrid, variantData } = useProductForm()
 const { createProduct, isLoading } = useCreateProduct()
+const toast = useToast()
 
 const productFormRef = useTemplateRef('productFormRef')
 
@@ -64,7 +65,10 @@ async function onSave(): Promise<void> {
   }
 
   const created = await createProduct(formData)
-  if (created) navigateTo('/admin/product')
+  if (created) {
+    toast.add({ title: 'Producto creado', color: 'success', icon: 'i-lucide-check-circle' })
+    navigateTo('/admin/product')
+  }
 }
 
 onMounted(() => {

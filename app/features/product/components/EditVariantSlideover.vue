@@ -17,6 +17,7 @@ const emit = defineEmits<{
 
 const { getProductVariantDetail, productVariantDetail, isLoading } = useProductVariantDetail()
 const { updateVariant, isSaving, error: saveError } = useUpdateVariant()
+const toast = useToast()
 
 const tabItems = [
   { label: 'Información básica', icon: 'i-lucide-info', slot: 'info' as const },
@@ -168,6 +169,7 @@ async function onSave() {
   )
 
   if (result) {
+    toast.add({ title: 'Variante actualizada', color: 'success', icon: 'i-lucide-check-circle' })
     emit('updated')
     open.value = false
   }

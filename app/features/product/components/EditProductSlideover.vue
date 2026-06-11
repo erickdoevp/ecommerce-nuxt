@@ -22,6 +22,8 @@ const { updateProduct, isSaving, error: saveError } = useUpdateProduct()
 const { getCategories, treeSelectCategory } = useTreeCategory()
 const { getTaxConfigs, selectTax } = useListTax()
 
+const toast = useToast()
+
 const formRef = ref()
 const isReady = ref(false)
 
@@ -106,6 +108,7 @@ async function onSave() {
   })
 
   if (result) {
+    toast.add({ title: 'Producto actualizado', color: 'success', icon: 'i-lucide-check-circle' })
     emit('updated')
     open.value = false
   }

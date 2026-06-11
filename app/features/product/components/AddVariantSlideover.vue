@@ -20,6 +20,7 @@ const emit = defineEmits<{
 const { getColors, selectColors } = useListColor()
 const { getSizes, selectSizes } = useListSize()
 const { createVariant, isSaving } = useCreateVariant()
+const toast = useToast()
 
 const schema = z.object({
   colorId: z.string().min(1, 'Selecciona un color'),
@@ -161,6 +162,7 @@ async function onSave() {
   )
 
   if (result) {
+    toast.add({ title: 'Variante agregada', color: 'success', icon: 'i-lucide-check-circle' })
     emit('created')
     open.value = false
   }

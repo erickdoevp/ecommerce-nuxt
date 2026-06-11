@@ -9,8 +9,10 @@ export const useCreateCollection = () => {
       isLoading.value = true
       const api = createAdminApi()
       await api('/collections', { method: 'POST', body: formData })
+      return true
     } catch (err) {
       error.value = extractApiError(err, 'Error al crear la colección')
+      return false
     } finally {
       isLoading.value = false
     }

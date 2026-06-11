@@ -17,6 +17,7 @@ const emit = defineEmits<{
 
 const { getProductVariantDetail, productVariantDetail, isLoading } = useProductVariantDetail()
 const { updateVariant, isSaving, error: saveError } = useUpdateVariant()
+const toast = useToast()
 
 // ─── Form state ───────────────────────────────────────────────────────────────
 const sku = ref('')
@@ -159,6 +160,7 @@ async function onSave() {
   )
 
   if (result) {
+    toast.add({ title: 'Variante actualizada', color: 'success', icon: 'i-lucide-check-circle' })
     emit('updated', {
       id: props.variantId,
       sku: sku.value,

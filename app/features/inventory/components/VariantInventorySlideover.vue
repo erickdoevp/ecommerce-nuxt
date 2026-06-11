@@ -17,6 +17,7 @@ const emit = defineEmits<{
 const { getProductVariantDetail, productVariantDetail, isLoading: isLoadingDetail } = useProductVariantDetail()
 const { searchVariantKardex, response: kardex, isLoading: isLoadingKardex } = usePaginatedVariantKardex()
 const { adjustStockDelta, setStockAbsolute, isSaving, error: saveError } = useAdjustVariantStock()
+const toast = useToast()
 
 type Mode = 'set' | 'delta'
 const mode = ref<Mode>('delta')
@@ -76,8 +77,9 @@ async function onSave() {
       })
 
   if (result) {
-    await load(props.variantId)
+    toast.add({ title: 'Inventario actualizado', color: 'success', icon: 'i-lucide-check-circle' })
     emit('updated')
+    open.value = false
   }
 }
 

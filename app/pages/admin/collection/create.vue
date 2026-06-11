@@ -7,6 +7,7 @@ import { useCreateCollection } from '~/features/collection/composables/useCreate
 
 const { form, image, cleanForm } = useCollectionForm()
 const { createCollection, isLoading } = useCreateCollection()
+const toast = useToast()
 
 onMounted(() => cleanForm())
 
@@ -28,7 +29,11 @@ async function onSave() {
     formData.append('image', image.value.file, image.value.file.name)
   }
 
-  await createCollection(formData)
+  const created = await createCollection(formData)
+  if (created) {
+    toast.add({ title: 'Colección creada', color: 'success', icon: 'i-lucide-check-circle' })
+    navigateTo('/admin/collection')
+  }
 }
 </script>
 

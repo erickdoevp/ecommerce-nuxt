@@ -18,6 +18,7 @@ const emit = defineEmits<{
 
 const { updateCategory, isSaving, error: saveError } = useUpdateCategory()
 const { getCategories, treeSelectCategory, isLoading: loadingCategories } = useTreeCategory()
+const toast = useToast()
 
 onMounted(() => getCategories())
 
@@ -180,6 +181,7 @@ async function onSave() {
 
   const result = await updateCategory(props.category.id, formData)
   if (result) {
+    toast.add({ title: 'Categoría actualizada', color: 'success', icon: 'i-lucide-check-circle' })
     emit('saved')
     open.value = false
   }
