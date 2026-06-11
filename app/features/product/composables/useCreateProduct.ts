@@ -8,15 +8,14 @@ export const useCreateProduct = () => {
     try {
       isLoading.value = true
       const api = createAdminApi()
-      const data = api('/products', {
+      const data = await api('/products', {
         method: 'POST',
         body: formData
       })
-      console.log(data)
+      return data
     } catch (err) {
-      console.log(err)
-
       error.value = extractApiError(err, 'Error al crear el producto')
+      return undefined
     } finally {
       isLoading.value = false
     }

@@ -7,10 +7,6 @@ import ProductFiltersForm from './ProductFiltersForm.vue'
 import ProductPreviewSlideover from './ProductPreviewSlideover.vue'
 import EditProductSlideover from './EditProductSlideover.vue'
 
-const emit = defineEmits<{
-  'view-variants': [id: string, basePrice: number]
-}>()
-
 const { searchProducts, products, isLoading, totaElements } = usePaginatedProductSearch()
 
 const previewProductId = ref<string | null>(null)
@@ -19,10 +15,6 @@ const showPreview = ref(false)
 function openPreview(id: string) {
   previewProductId.value = id
   showPreview.value = true
-}
-
-function openVariants(id: string, basePrice: number) {
-  emit('view-variants', id, basePrice)
 }
 
 const editProductId = ref<string | null>(null)
@@ -37,7 +29,7 @@ function rowActions(product: Content) {
   return [[
     { label: 'Editar producto', icon: 'i-lucide-pencil', onSelect: () => openEditProduct(product.id) },
     { label: 'Ver producto', icon: 'i-lucide-eye', onSelect: () => openPreview(product.id) },
-    { label: 'Ver variantes', icon: 'i-lucide-shirt', onSelect: () => openVariants(product.id, product.basePrice) }
+    { label: 'Ver variantes', icon: 'i-lucide-shirt', to: `/admin/product/variants/${product.id}` }
   ]]
 }
 

@@ -48,20 +48,26 @@ async function onSave() {
         <div class="flex flex-col gap-3 w-[70%]">
           <CreateCollectionForm />
           <CollectionMediaCard />
+          <div class="flex items-center justify-end gap-3">
+            <UButton
+              color="neutral"
+              variant="outline"
+              to="/admin/collection"
+            >
+              Cancelar
+            </UButton>
+            <UButton
+              :loading="isLoading"
+              icon="i-lucide-save"
+              @click="onSave"
+            >
+              Crear colección
+            </UButton>
+          </div>
         </div>
         <div class="flex flex-col gap-3 flex-1">
           <CollectionState />
         </div>
-      </div>
-
-      <div class="w-full mt-4">
-        <UButton
-          class="w-full"
-          :loading="isLoading"
-          @click="onSave"
-        >
-          Guardar colección
-        </UButton>
       </div>
     </UContainer>
   </div>

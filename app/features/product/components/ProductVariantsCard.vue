@@ -466,7 +466,7 @@ const columns = computed(() => [
   { id: 'colorOrSize', header: 'Color / Talla' },
   { id: 'image', header: 'Imagen' },
   ...(props.showSku ? [{ id: 'sku', header: 'SKU' }] : []),
-  { id: 'costPrice', header: 'Precio de costo' },
+  { id: 'costPrice', header: 'Costo unitario' },
   { id: 'priceAdjust', header: 'Ajuste' },
   { id: 'suggestedPrice', header: 'Precio sugerido' },
   { id: 'finalPrice', header: 'Precio final' },

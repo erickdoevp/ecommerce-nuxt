@@ -1,22 +1,8 @@
 <script setup lang="ts">
 import PaginatedProductTable from '~/features/product/components/PaginatedProductTable.vue'
-import PaginatedProductVariantsTable from '~/features/product/components/PaginatedProductVariantsTable.vue'
 import { useProductForm } from '~/features/product/composables/useProductForm'
 
 const { cleanProductData } = useProductForm()
-
-const variantsProductId = ref<string | null>(null)
-const variantsBasePrice = ref(0)
-const variantsTableRef = ref<{ reload: () => void } | null>(null)
-
-function onViewVariants(id: string, basePrice: number) {
-  variantsProductId.value = id
-  variantsBasePrice.value = basePrice
-}
-
-function onVariantCreated(productId: string) {
-  if (productId === variantsProductId.value) variantsTableRef.value?.reload()
-}
 </script>
 
 <template>
@@ -39,18 +25,8 @@ function onVariantCreated(productId: string) {
       </UButton>
     </div>
     <div class="bg-white p-4 rounded-md">
-      <PaginatedProductTable
-        @view-variants="onViewVariants"
-        @variant-created="onVariantCreated"
-      />
+      <PaginatedProductTable />
     </div>
-
-    <PaginatedProductVariantsTable
-      ref="variantsTableRef"
-      :product-id="variantsProductId"
-      :base-price="variantsBasePrice"
-      @close="variantsProductId = null"
-    />
   </div>
 </template>
 

@@ -299,7 +299,7 @@ async function onSave() {
                     </UInput>
                   </UFormField>
 
-                  <UFormField label="Precio de costo">
+                  <UFormField label="Costo unitario">
                     <UInput
                       v-model.number="costPrice"
                       type="number"
@@ -351,7 +351,7 @@ async function onSave() {
                   <UFormField
                     label="Ganancia estimada"
                     class="col-span-2"
-                    help="Precio final menos el precio de costo (sin considerar IVA)."
+                    help="Precio final menos el costo unitario (sin considerar IVA)."
                   >
                     <UInput
                       :model-value="formatPrice(profit)"

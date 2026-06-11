@@ -4,13 +4,19 @@ import { categorySchema } from '../schemas/category.schema'
 import type { CategorySchema } from '../schemas/category.schema'
 import { useCategoryForm } from '../composables/useCategoryForm'
 import { useCreateCategory } from '../composables/useCreateCategory'
-import CategoryMediaCard from './CategoryMediaCard.vue'
 import { useTreeCategory } from '../composables/useTreeCategory'
 
 const { form, images, wordCount, slugManuallyEdited, resetForm } = useCategoryForm()
 const { createCategory, isLoading } = useCreateCategory()
 const { getCategories, treeSelectCategory, isLoading: loadingCategories } = useTreeCategory()
 const toast = useToast()
+
+const formRef = useTemplateRef('formRef')
+
+defineExpose({
+  submit: () => formRef.value?.submit(),
+  isLoading
+})
 
 onMounted(() => getCategories())
 
@@ -56,6 +62,7 @@ async function onSubmit(event: FormSubmitEvent<CategorySchema>) {
 
 <template>
   <UForm
+    ref="formRef"
     :schema="categorySchema"
     :state="form"
     class="space-y-4"
@@ -127,7 +134,7 @@ async function onSubmit(event: FormSubmitEvent<CategorySchema>) {
 
       <!-- Categoría padre -->
       <UFormField
-        label="Categoría"
+        label="Categoría padre"
         name="categoryId"
         class="w-full"
       >
@@ -156,27 +163,6 @@ async function onSubmit(event: FormSubmitEvent<CategorySchema>) {
           </template>
         </USelectMenu>
       </UFormField>
-    </div>
-
-    <!-- Imagen -->
-    <CategoryMediaCard />
-
-    <!-- Acciones -->
-    <div class="flex items-center justify-end gap-3">
-      <UButton
-        color="neutral"
-        variant="outline"
-        to="/admin/category"
-      >
-        Cancelar
-      </UButton>
-      <UButton
-        type="submit"
-        :loading="isLoading"
-        icon="i-lucide-save"
-      >
-        Crear categoría
-      </UButton>
     </div>
   </UForm>
 </template>

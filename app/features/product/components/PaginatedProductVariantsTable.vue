@@ -40,7 +40,7 @@ watch(() => props.productId, (id) => {
     currentPage.value = 1
     load(1)
   }
-})
+}, { immediate: true })
 
 async function load(page: number) {
   if (!props.productId) return
@@ -67,7 +67,7 @@ const columns: TableColumn<ProductVariantListItem>[] = [
   { accessorKey: 'color', header: 'Color' },
   { accessorKey: 'size', header: 'Talla' },
   { accessorKey: 'priceAdjustment', header: 'Ajuste de precio' },
-  { accessorKey: 'costPrice', header: 'Costo' },
+  { accessorKey: 'costPrice', header: 'Costo unitario' },
   { id: 'profit', header: 'Ganancia' },
   { accessorKey: 'availableStock', header: 'Stock disponible' },
   { accessorKey: 'active', header: 'Estado' },

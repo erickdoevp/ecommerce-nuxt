@@ -223,7 +223,7 @@ async function onSave() {
           </h3>
           <div class="grid grid-cols-2 gap-4">
             <UFormField
-              label="Precio de costo"
+              label="Costo unitario"
               name="costPrice"
             >
               <UInput

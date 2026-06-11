@@ -322,7 +322,7 @@ async function onSave() {
                 </UInput>
               </UFormField>
 
-              <UFormField label="Precio de costo">
+              <UFormField label="Costo unitario">
                 <UInput
                   v-model.number="costPrice"
                   type="number"

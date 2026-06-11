@@ -15,7 +15,7 @@ const { getColors, selectColors } = useListColor()
 const { getTaxConfigs, selectTax } = useListTax()
 const { getCategories, treeSelectCategory } = useTreeCategory()
 const { form, images, variantGrid, variantData } = useProductForm()
-const { createProduct } = useCreateProduct()
+const { createProduct, isLoading } = useCreateProduct()
 
 const productFormRef = useTemplateRef('productFormRef')
 
@@ -63,7 +63,8 @@ async function onSave(): Promise<void> {
     }
   }
 
-  createProduct(formData)
+  const created = await createProduct(formData)
+  if (created) navigateTo('/admin/product')
 }
 
 onMounted(() => {
@@ -77,13 +78,22 @@ onMounted(() => {
 <template>
   <div class="page-container">
     <UContainer>
-      <div class="flex flex-col gap-1 mb-6">
-        <h1 class="text-xl font-semibold text-gray-900">
-          Nuevo producto
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5">
-          Completa los datos para agregar un nuevo producto a la tienda.
-        </p>
+      <div class="flex items-center gap-3 mb-6">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          icon="i-lucide-arrow-left"
+          to="/admin/product"
+        />
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-semibold text-gray-900">
+            Nuevo producto
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5">
+            Completa los datos para agregar un nuevo producto a la tienda.
+          </p>
+        </div>
       </div>
       <div class="flex flex-row gap-3">
         <div class="flex flex-col gap-3 w-[70%]">
@@ -101,18 +111,26 @@ onMounted(() => {
             :select-colors="selectColors"
             :select-sizes="selectSizes"
           />
+          <div class="flex items-center justify-end gap-3">
+            <UButton
+              color="neutral"
+              variant="outline"
+              to="/admin/product"
+            >
+              Cancelar
+            </UButton>
+            <UButton
+              :loading="isLoading"
+              icon="i-lucide-save"
+              @click="onSave"
+            >
+              Crear producto
+            </UButton>
+          </div>
         </div>
         <div class="flex flex-col gap-3 flex-1">
           <ProductState />
         </div>
-      </div>
-      <div class="w-full">
-        <UButton
-          class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition-colors"
-          @click="onSave"
-        >
-          Save Product
-        </UButton>
       </div>
     </UContainer>
   </div>
