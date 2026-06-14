@@ -29,3 +29,15 @@ export interface SignUpResponse {
   accessToken: string
   tokenType: string
 }
+
+export interface SignInRequest {
+  usernameOrEmail: string
+  password: string
+  turnstileToken: string
+}
+
+export interface SignInResponse {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+}

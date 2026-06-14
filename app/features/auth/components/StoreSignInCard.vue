@@ -1,25 +1,37 @@
 <script setup lang="ts">
+defineProps<{
+  loading?: boolean
+}>()
+
 const emit = defineEmits<{
-  submit: [payload: { email: string, password: string, remember: boolean, turnstileToken: string }]
+  submit: [payload: { usernameOrEmail: string, password: string, remember: boolean, turnstileToken: string }]
   google: []
   guest: []
 }>()
 
-const email = ref('')
+const usernameOrEmail = ref('')
 const password = ref('')
 const remember = ref(false)
 const showPassword = ref(false)
 const turnstileToken = ref('')
+const turnstileRef = useTemplateRef('turnstileRef')
 
 function onSubmit() {
   if (!turnstileToken.value) return
   emit('submit', {
-    email: email.value,
+    usernameOrEmail: usernameOrEmail.value,
     password: password.value,
     remember: remember.value,
     turnstileToken: turnstileToken.value
   })
 }
+
+function resetTurnstile() {
+  turnstileToken.value = ''
+  turnstileRef.value?.reset()
+}
+
+defineExpose({ resetTurnstile })
 </script>
 
 <template>
@@ -51,14 +63,14 @@ function onSubmit() {
     >
       <div>
         <label class="block text-[11px] tracking-widest text-muted mb-2">
-          CORREO ELECTRÓNICO
+          CORREO O USUARIO
         </label>
         <UInput
-          v-model="email"
-          type="email"
+          v-model="usernameOrEmail"
+          type="text"
           required
           placeholder="hola@labendita.mx"
-          autocomplete="email"
+          autocomplete="username"
           size="xl"
           class="w-full"
         />
@@ -104,6 +116,7 @@ function onSubmit() {
 
       <div class="flex justify-center">
         <NuxtTurnstile
+          ref="turnstileRef"
           v-model="turnstileToken"
           :options="{ theme: 'light', language: 'es' }"
         />
@@ -113,6 +126,7 @@ function onSubmit() {
         type="submit"
         block
         size="xl"
+        :loading="loading"
         :disabled="!turnstileToken"
         class="tracking-widest justify-center"
       >
