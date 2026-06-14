@@ -50,7 +50,11 @@ export function createClientApi() {
     }
   })
 
-  return async function clientApi<T>(request: string, options?: Parameters<typeof instance>[1]): Promise<T> {
+  return async function clientApi<T>(
+    request: string,
+    options?: Parameters<typeof instance>[1],
+    config?: { silent?: boolean }
+  ): Promise<T> {
     try {
       return await instance<T>(request, options)
     } catch (err) {
@@ -62,7 +66,7 @@ export function createClientApi() {
         // (onRequest vuelve a leer auth.token, ya actualizado).
         if (refreshed) return await instance<T>(request, options)
         await navigateTo('/sign-in')
-      } else {
+      } else if (!config?.silent) {
         toast.add({
           title: 'Error',
           description: extractApiError(err),

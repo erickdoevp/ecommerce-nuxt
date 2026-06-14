@@ -57,7 +57,7 @@ const statusOptions = [
 
 const primaryImage = computed(() => {
   const imgs = product.value?.images ?? []
-  return imgs.find(i => i.primary)?.url ?? imgs[0]?.url ?? ''
+  return imgs.find(i => i.isPrimary)?.url ?? imgs[0]?.url ?? ''
 })
 
 const toolbarItems = [

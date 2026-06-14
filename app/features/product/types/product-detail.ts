@@ -27,7 +27,7 @@ export interface Image {
   id: string
   altText: null | string
   position: number
-  primary: boolean
+  isPrimary: boolean
   url: string
 }
 

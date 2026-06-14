@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AddressFormSlideover from '~/features/address/components/AddressFormSlideover.vue'
 import { useClientAddresses } from '~/features/address/composables/useClientAddresses'
 import type { AddressResponse } from '~/features/address/types/address'
 
@@ -6,9 +7,73 @@ definePageMeta({
   layout: 'account'
 })
 
-const { addresses, isLoading, fetchAddresses } = useClientAddresses()
+const {
+  addresses,
+  isLoading,
+  isProcessing,
+  fetchAddresses,
+  deleteAddress,
+  setDefaultAddress
+} = useClientAddresses()
 
 onMounted(() => fetchAddresses())
+
+const slideoverOpen = ref(false)
+const editing = ref<AddressResponse | undefined>(undefined)
+
+function openCreate() {
+  editing.value = undefined
+  slideoverOpen.value = true
+}
+
+function openEdit(address: AddressResponse) {
+  editing.value = address
+  slideoverOpen.value = true
+}
+
+// ─── Confirmación (eliminar / marcar principal) ─────────────────────────────
+const confirm = reactive({
+  open: false,
+  type: 'delete' as 'delete' | 'default',
+  address: undefined as AddressResponse | undefined
+})
+
+const confirmText = computed(() =>
+  confirm.type === 'delete'
+    ? {
+        title: 'Eliminar dirección',
+        body: `¿Seguro que quieres eliminar la dirección "${confirm.address?.alias}"? Esta acción no se puede deshacer.`,
+        accept: 'Eliminar',
+        color: 'error' as const
+      }
+    : {
+        title: 'Marcar como principal',
+        body: `¿Usar "${confirm.address?.alias}" como tu dirección principal?`,
+        accept: 'Marcar como principal',
+        color: 'primary' as const
+      }
+)
+
+function askDelete(address: AddressResponse) {
+  confirm.type = 'delete'
+  confirm.address = address
+  confirm.open = true
+}
+
+function askSetDefault(address: AddressResponse) {
+  confirm.type = 'default'
+  confirm.address = address
+  confirm.open = true
+}
+
+async function onConfirm() {
+  const address = confirm.address
+  if (!address) return
+  const ok = confirm.type === 'delete'
+    ? await deleteAddress(address.id)
+    : await setDefaultAddress(address.id)
+  if (ok) confirm.open = false
+}
 
 function line1(a: AddressResponse): string {
   const interior = a.interiorNumber ? ` Int. ${a.interiorNumber}` : ''
@@ -34,6 +99,7 @@ function line2(a: AddressResponse): string {
       <UButton
         icon="i-lucide-plus"
         class="rounded-full tracking-widest shrink-0"
+        @click="openCreate"
       >
         Agregar
       </UButton>
@@ -50,7 +116,7 @@ function line2(a: AddressResponse): string {
             {{ address.alias }}
           </p>
           <span
-            v-if="address.isDefault"
+            v-if="address.default"
             class="rounded-full bg-accented px-3 py-1 text-[10px] tracking-[0.15em] uppercase text-toned"
           >
             Principal
@@ -70,12 +136,22 @@ function line2(a: AddressResponse): string {
           <button
             type="button"
             class="text-highlighted underline underline-offset-4 hover:opacity-80 transition-opacity"
+            @click="openEdit(address)"
           >
             Editar
           </button>
           <button
+            v-if="!address.default"
+            type="button"
+            class="text-primary hover:opacity-80 transition-opacity"
+            @click="askSetDefault(address)"
+          >
+            Hacer principal
+          </button>
+          <button
             type="button"
             class="text-muted hover:text-highlighted transition-colors"
+            @click="askDelete(address)"
           >
             Eliminar
           </button>
@@ -86,6 +162,7 @@ function line2(a: AddressResponse): string {
       <button
         type="button"
         class="rounded-xl border border-dashed border-default p-6 min-h-[180px] flex flex-col items-center justify-center gap-3 text-muted hover:text-highlighted hover:border-primary transition-colors"
+        @click="openCreate"
       >
         <UIcon
           name="i-lucide-plus"
@@ -103,5 +180,39 @@ function line2(a: AddressResponse): string {
     >
       Aún no tienes direcciones guardadas.
     </p>
+
+    <AddressFormSlideover
+      v-model:open="slideoverOpen"
+      :address="editing"
+    />
+
+    <UModal
+      v-model:open="confirm.open"
+      :title="confirmText.title"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <p class="text-sm text-muted">
+          {{ confirmText.body }}
+        </p>
+      </template>
+
+      <template #footer="{ close }">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          @click="close"
+        >
+          Cancelar
+        </UButton>
+        <UButton
+          :color="confirmText.color"
+          :loading="isProcessing"
+          @click="onConfirm"
+        >
+          {{ confirmText.accept }}
+        </UButton>
+      </template>
+    </UModal>
   </div>
 </template>
