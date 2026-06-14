@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { useAuthStore } from '~/features/auth/store/auth'
+
+const authStore = useAuthStore()
 
 const variant = ref<'sidebar' | 'floating' | 'inset'>('sidebar')
 const side = ref<'left' | 'right'>('left')
@@ -129,6 +132,7 @@ const initials = computed(() => {
             color="neutral"
             variant="ghost"
             aria-label="Cerrar sesión"
+            @click="authStore.logout()"
           />
         </div>
       </template>

@@ -54,7 +54,7 @@ const features = [
 <template>
   <div class="min-h-screen flex">
     <!-- Left panel -->
-    <div class="hidden lg:flex lg:w-[45%] bg-[#1a2a1a] flex-col justify-between p-12 relative overflow-hidden">
+    <div class="hidden lg:flex lg:w-[45%] bg-inverted flex-col justify-between p-12 relative overflow-hidden">
       <!-- Background decorative circle -->
       <div class="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-white/5" />
       <div class="absolute top-32 -right-10 w-64 h-64 rounded-full bg-white/5" />
@@ -105,15 +105,15 @@ const features = [
     </div>
 
     <!-- Right panel -->
-    <div class="flex-1 bg-[#f4f4f4] flex items-center justify-center p-8">
+    <div class="flex-1 bg-muted flex items-center justify-center p-8">
       <div class="w-full max-w-md">
-        <div class="bg-white rounded-2xl p-10 shadow-sm border border-gray-100">
+        <div class="bg-default rounded-2xl p-10 shadow-sm border border-default">
           <!-- Header -->
           <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900">
+            <h2 class="text-2xl font-bold text-highlighted">
               Iniciar sesión
             </h2>
-            <p class="text-gray-500 mt-1 text-sm">
+            <p class="text-muted mt-1 text-sm">
               Bienvenido de nuevo. Por favor, ingresa tus credenciales.
             </p>
           </div>
@@ -154,7 +154,7 @@ const features = [
               <template #hint>
                 <button
                   type="button"
-                  class="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+                  class="text-xs text-primary hover:text-primary/80 font-medium"
                 >
                   ¿Olvidaste tu contraseña?
                 </button>
@@ -177,15 +177,15 @@ const features = [
               :loading="loading"
               block
               size="lg"
-              class="bg-emerald-700 hover:bg-emerald-800 text-white mt-2"
+              class="mt-2"
             >
               Iniciar sesión
             </UButton>
           </UForm>
 
-          <p class="text-center text-sm text-gray-500 mt-6">
+          <p class="text-center text-sm text-muted mt-6">
             ¿No tienes una cuenta?
-            <span class="text-emerald-700 font-medium cursor-pointer hover:text-emerald-800">
+            <span class="text-primary font-medium cursor-pointer hover:text-primary/80">
               Contacta al administrador
             </span>
           </p>

@@ -3,11 +3,17 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxtjs/turnstile'
   ],
 
   devtools: {
     enabled: true
+  },
+
+  colorMode: {
+    preference: 'light',
+    fallback: 'light'
   },
 
   css: ['~/assets/css/main.css'],
@@ -25,8 +31,10 @@ export default defineNuxtConfig({
     '/admin/**': { ssr: false }
   },
 
-  public: {
-    baseUrl: process.env.NUXT_PUBLIC_BASE_URL
+  runtimeConfig: {
+    public: {
+      baseUrl: ''
+    }
   },
 
   compatibilityDate: '2025-01-15',

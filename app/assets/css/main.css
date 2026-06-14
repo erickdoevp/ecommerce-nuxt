@@ -2,17 +2,122 @@
 @import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: 'Jost', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  /* ── Primario · Vino (color firma) ─────────────────────────────── */
+  --color-wine-50: #FAF3F4;
+  --color-wine-100: #F3E3E5;
+  --color-wine-200: #E4C4C8;
+  --color-wine-300: #CD99A0;
+  --color-wine-400: #A85F6A;
+  --color-wine-500: #5E2A33;
+  --color-wine-600: #54262E;
+  --color-wine-700: #461F27;
+  --color-wine-800: #391A20;
+  --color-wine-900: #2C1419;
+  --color-wine-950: #1A0B0F;
+
+  /* ── Secundario · Terracota (acento) ───────────────────────────── */
+  --color-terracotta-50: #FAF4F0;
+  --color-terracotta-100: #F2E6DB;
+  --color-terracotta-200: #E4CBB8;
+  --color-terracotta-300: #D0A98C;
+  --color-terracotta-400: #B6886A;
+  --color-terracotta-500: #9A6B53;
+  --color-terracotta-600: #835A46;
+  --color-terracotta-700: #6B4A3A;
+  --color-terracotta-800: #543A2E;
+  --color-terracotta-900: #3F2C23;
+  --color-terracotta-950: #251913;
+
+  /* ── Neutro · Arena (cálido) ───────────────────────────────────── */
+  --color-sand-50: #FCFBF7;
+  --color-sand-100: #F6F1E9;
+  --color-sand-200: #DCD5C7;
+  --color-sand-300: #C9BFAE;
+  --color-sand-400: #B3A99B;
+  --color-sand-500: #82796D;
+  --color-sand-600: #6A6256;
+  --color-sand-700: #4F493F;
+  --color-sand-800: #36322B;
+  --color-sand-900: #211D1A;
+  --color-sand-950: #14110F;
+
+  /* ── Éxito · Bosque ────────────────────────────────────────────── */
+  --color-forest-50: #E2EFE5;
+  --color-forest-100: #CFE5D6;
+  --color-forest-200: #AAD0B8;
+  --color-forest-300: #7DB594;
+  --color-forest-400: #51916E;
+  --color-forest-500: #2F6B4F;
+  --color-forest-600: #285D45;
+  --color-forest-700: #224D39;
+  --color-forest-800: #1C3E2E;
+  --color-forest-900: #163024;
+  --color-forest-950: #0C1D16;
+
+  /* ── Aviso · Bronce ────────────────────────────────────────────── */
+  --color-bronze-50: #F3E6C8;
+  --color-bronze-100: #ECD9AC;
+  --color-bronze-200: #DFC07E;
+  --color-bronze-300: #CFA64F;
+  --color-bronze-400: #AC8533;
+  --color-bronze-500: #8A6A22;
+  --color-bronze-600: #75591D;
+  --color-bronze-700: #5E4818;
+  --color-bronze-800: #483714;
+  --color-bronze-900: #38290F;
+  --color-bronze-950: #221908;
+
+  /* ── Error · Carmesí ───────────────────────────────────────────── */
+  --color-crimson-50: #FBEAED;
+  --color-crimson-100: #F6D2D8;
+  --color-crimson-200: #EDA8B3;
+  --color-crimson-300: #E27989;
+  --color-crimson-400: #D2546A;
+  --color-crimson-500: #C0344A;
+  --color-crimson-600: #A52B3F;
+  --color-crimson-700: #872333;
+  --color-crimson-800: #6A1B28;
+  --color-crimson-900: #50141F;
+  --color-crimson-950: #320C13;
+
+  /* ── Detalles finos · Oro (líneas, estrellas de rating) ────────── */
+  --color-gold-50: #FAF6EE;
+  --color-gold-100: #F3EAD6;
+  --color-gold-200: #E7D4AD;
+  --color-gold-300: #D8BC83;
+  --color-gold-400: #C4A263;
+  --color-gold-500: #B08D57;
+  --color-gold-600: #957449;
+  --color-gold-700: #74593A;
+  --color-gold-800: #5A4630;
+  --color-gold-900: #4A3A29;
+  --color-gold-950: #2A2016;
+}
+
+/* ── Tokens semánticos de Nuxt UI (modo claro) ──────────────────────
+   Sobrescriben los fondos/textos/bordes globales con los hex de marca.
+   Van sin @layer para tener prioridad sobre los defaults de Nuxt UI. */
+:root {
+  /* Texto */
+  --ui-text-dimmed: #B3A99B;      /* placeholders, deshabilitado suave */
+  --ui-text-muted: #82796D;       /* secundario / etiquetas */
+  --ui-text-toned: #6A6256;
+  --ui-text: #211D1A;             /* principal (negro cálido) */
+  --ui-text-highlighted: #211D1A; /* títulos / énfasis */
+
+  /* Fondos */
+  --ui-bg: #FFFFFF;               /* fondo principal */
+  --ui-bg-muted: #FCFBF7;         /* superficie: tarjetas, inputs */
+  --ui-bg-elevated: #F6F1E9;      /* bandas alternas (crema) */
+  --ui-bg-accented: #EBE1D4;      /* fondos suaves: tabs, hover, chips */
+  --ui-bg-inverted: #211D1A;
+
+  /* Bordes */
+  --ui-border: #DCD5C7;           /* bordes y divisores */
+  --ui-border-muted: #EBE1D4;
+  --ui-border-accented: #DCD5C7;
+  --ui-border-inverted: #211D1A;
 }
