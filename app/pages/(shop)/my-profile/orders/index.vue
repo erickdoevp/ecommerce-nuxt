@@ -1,42 +1,47 @@
 <script setup lang="ts">
+import MyOrderDetailSlideover from '~/features/order/components/MyOrderDetailSlideover.vue'
+import { useClientOrders } from '~/features/order/composables/useClientOrders'
+import { ORDER_STATUS_META } from '~/features/order/types/order-search'
+import type { MyOrder } from '~/features/order/types/my-order'
+
 definePageMeta({
   layout: 'account'
 })
 
-// TODO: reemplazar por los pedidos reales del usuario.
-const orders = [
-  {
-    number: 'LB-2418',
-    date: '28 May 2026',
-    total: 818,
-    status: 'Entregado',
-    products: 'Conjunto Encaje Aurora · Tanga Encaje Vino',
-    swatches: ['from-[#F6D7DD] to-[#EBA9B6]', 'from-[#C98B96] to-[#9A5562]']
-  },
-  {
-    number: 'LB-2390',
-    date: '12 May 2026',
-    total: 479,
-    status: 'En camino',
-    products: 'Body Encaje Marfil',
-    swatches: ['from-[#EFE3D2] to-[#E0CBB0]']
-  },
-  {
-    number: 'LB-2351',
-    date: '30 Abr 2026',
-    total: 329,
-    status: 'Entregado',
-    products: 'Liguero Pasión',
-    swatches: ['from-[#E98A7A] to-[#C0344A]']
-  }
-]
+const {
+  orders,
+  isLoading,
+  page,
+  totalElements,
+  pageSize,
+  fetchOrders
+} = useClientOrders()
 
-function statusColor(status: string): 'success' | 'warning' {
-  return status === 'En camino' ? 'warning' : 'success'
+onMounted(() => fetchOrders(1))
+
+const detailOpen = ref(false)
+const selectedId = ref<string | null>(null)
+
+function openDetail(order: MyOrder) {
+  selectedId.value = order.id
+  detailOpen.value = true
 }
 
-function secondaryAction(status: string): string {
-  return status === 'En camino' ? 'Rastrear' : 'Volver a pedir'
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value ?? 0)
+}
+
+function formatDate(value: string) {
+  if (!value) return '—'
+  return new Date(value).toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+function summary(order: MyOrder): string {
+  return order.items.map(i => i.productName).join(' · ')
 }
 </script>
 
@@ -46,10 +51,34 @@ function secondaryAction(status: string): string {
       Mis pedidos
     </h2>
 
-    <div class="mt-6 space-y-5">
+    <!-- Cargando -->
+    <div
+      v-if="isLoading && orders.length === 0"
+      class="mt-6 space-y-5"
+    >
+      <USkeleton
+        v-for="i in 3"
+        :key="i"
+        class="h-40 w-full rounded-xl"
+      />
+    </div>
+
+    <!-- Vacío -->
+    <p
+      v-else-if="!isLoading && orders.length === 0"
+      class="mt-6 text-sm text-muted"
+    >
+      Aún no tienes pedidos.
+    </p>
+
+    <!-- Lista -->
+    <div
+      v-else
+      class="mt-6 space-y-5"
+    >
       <article
         v-for="order in orders"
-        :key="order.number"
+        :key="order.id"
         class="rounded-xl border border-default overflow-hidden"
       >
         <!-- Encabezado -->
@@ -59,8 +88,8 @@ function secondaryAction(status: string): string {
               <p class="text-[10px] tracking-[0.2em] uppercase text-muted">
                 Pedido
               </p>
-              <p class="mt-1 text-sm text-highlighted">
-                #{{ order.number }}
+              <p class="mt-1 text-sm text-highlighted font-mono">
+                {{ order.orderNumber }}
               </p>
             </div>
             <div>
@@ -68,7 +97,7 @@ function secondaryAction(status: string): string {
                 Fecha
               </p>
               <p class="mt-1 text-sm text-highlighted">
-                {{ order.date }}
+                {{ formatDate(order.createdAt) }}
               </p>
             </div>
             <div>
@@ -76,17 +105,17 @@ function secondaryAction(status: string): string {
                 Total
               </p>
               <p class="mt-1 text-sm text-highlighted">
-                ${{ order.total }} MXN
+                {{ formatCurrency(order.total) }}
               </p>
             </div>
           </div>
 
           <UBadge
-            :color="statusColor(order.status)"
+            :color="ORDER_STATUS_META[order.status]?.color ?? 'neutral'"
             variant="subtle"
             class="rounded-full text-[10px] tracking-[0.15em] uppercase shrink-0"
           >
-            {{ order.status }}
+            {{ ORDER_STATUS_META[order.status]?.label ?? order.status }}
           </UBadge>
         </div>
 
@@ -94,37 +123,48 @@ function secondaryAction(status: string): string {
         <div class="bg-muted border-t border-default px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-center gap-4 min-w-0">
             <div class="flex gap-2 shrink-0">
-              <div
-                v-for="(swatch, i) in order.swatches"
-                :key="i"
-                class="w-14 h-14 rounded-lg bg-gradient-to-br"
-                :class="swatch"
-              />
+              <img
+                v-for="item in order.items.slice(0, 3)"
+                :key="item.id"
+                :src="item.imageUrl ?? undefined"
+                :alt="item.productName"
+                class="w-14 h-14 rounded-lg object-cover bg-elevated"
+              >
             </div>
-            <p class="text-sm text-highlighted">
-              {{ order.products }}
+            <p class="text-sm text-highlighted line-clamp-2">
+              {{ summary(order) }}
             </p>
           </div>
 
-          <div class="flex items-center gap-3 shrink-0">
-            <UButton
-              color="neutral"
-              variant="outline"
-              size="sm"
-              class="rounded-full text-[11px] tracking-[0.1em] uppercase"
-            >
-              Ver detalle
-            </UButton>
-            <UButton
-              variant="outline"
-              size="sm"
-              class="rounded-full text-[11px] tracking-[0.1em] uppercase"
-            >
-              {{ secondaryAction(order.status) }}
-            </UButton>
-          </div>
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            class="rounded-full text-[11px] tracking-widest uppercase shrink-0"
+            @click="openDetail(order)"
+          >
+            Ver detalle
+          </UButton>
         </div>
       </article>
+
+      <div
+        v-if="totalElements > pageSize"
+        class="flex justify-center pt-2"
+      >
+        <UPagination
+          v-model:page="page"
+          variant="ghost"
+          :total="totalElements"
+          :items-per-page="pageSize"
+          @update:page="fetchOrders"
+        />
+      </div>
     </div>
+
+    <MyOrderDetailSlideover
+      v-model:open="detailOpen"
+      :order-id="selectedId"
+    />
   </div>
 </template>

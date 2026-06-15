@@ -44,7 +44,7 @@ function resetForm() {
   form.cp = a?.cp ?? ''
   form.municipio = a?.municipio ?? ''
   form.estado = a?.estado ?? ''
-  form.isDefault = a?.isDefault ?? false
+  form.isDefault = a?.default ?? false
   cpNotFound.value = false
   nextTick(() => {
     suppressCpLookup = false

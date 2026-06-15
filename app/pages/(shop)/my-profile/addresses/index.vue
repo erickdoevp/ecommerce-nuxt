@@ -161,7 +161,7 @@ function line2(a: AddressResponse): string {
       <!-- Agregar dirección -->
       <button
         type="button"
-        class="rounded-xl border border-dashed border-default p-6 min-h-[180px] flex flex-col items-center justify-center gap-3 text-muted hover:text-highlighted hover:border-primary transition-colors"
+        class="rounded-xl border border-dashed border-default p-6 min-h-45 flex flex-col items-center justify-center gap-3 text-muted hover:text-highlighted hover:border-primary transition-colors"
         @click="openCreate"
       >
         <UIcon

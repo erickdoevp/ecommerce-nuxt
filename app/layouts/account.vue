@@ -19,7 +19,6 @@ const rewards = 1280
 const nav = [
   { label: 'Resumen', to: '/my-profile' },
   { label: 'Mis pedidos', to: '/my-profile/orders' },
-  { label: 'Favoritos', to: '/my-profile/favorites' },
   { label: 'Direcciones', to: '/my-profile/addresses' },
   { label: 'Mis datos', to: '/my-profile/data' }
 ]
@@ -31,12 +30,24 @@ function isActive(to: string): boolean {
 function onLogout() {
   clientAuth.logout()
 }
+
+const logoutAllOpen = ref(false)
+const isLoggingOutAll = ref(false)
+
+async function onLogoutAll() {
+  isLoggingOutAll.value = true
+  try {
+    await clientAuth.logoutAll()
+  } finally {
+    isLoggingOutAll.value = false
+  }
+}
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-default">
     <!-- Header -->
-    <header class="border-b border-default">
+    <header class="sticky top-0 z-50 border-b border-default bg-default/80 backdrop-blur-md">
       <div class="max-w-7xl mx-auto w-full px-6 lg:px-10 h-20 flex items-center justify-between">
         <NuxtLink
           to="/"
@@ -158,6 +169,18 @@ function onLogout() {
             />
             Cerrar sesión
           </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-2 px-4 py-2 text-sm text-muted hover:text-highlighted transition-colors"
+            @click="logoutAllOpen = true"
+          >
+            <UIcon
+              name="i-lucide-monitor-x"
+              class="w-4 h-4"
+            />
+            Cerrar sesión en todos los dispositivos
+          </button>
         </aside>
 
         <div class="flex-1 min-w-0">
@@ -165,5 +188,36 @@ function onLogout() {
         </div>
       </div>
     </div>
+
+    <!-- Confirmar cierre de sesión en todos los dispositivos -->
+    <UModal
+      v-model:open="logoutAllOpen"
+      title="Cerrar sesión en todos los dispositivos"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <p class="text-sm text-muted">
+          Se cerrará tu sesión en este y en todos los demás dispositivos donde
+          hayas iniciado sesión. Tendrás que volver a iniciar sesión en cada uno.
+        </p>
+      </template>
+
+      <template #footer="{ close }">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          @click="close"
+        >
+          Cancelar
+        </UButton>
+        <UButton
+          color="error"
+          :loading="isLoggingOutAll"
+          @click="onLogoutAll"
+        >
+          Cerrar todas las sesiones
+        </UButton>
+      </template>
+    </UModal>
   </div>
 </template>

@@ -27,7 +27,7 @@ const rules = computed(() => [
   { label: 'Una letra mayúscula (A–Z)', met: /[A-Z]/.test(password.value) },
   { label: 'Una letra minúscula (a–z)', met: /[a-z]/.test(password.value) },
   { label: 'Un número (0–9)', met: /[0-9]/.test(password.value) },
-  { label: 'Un carácter especial (!#$…)', met: /[^A-Za-z0-9]/.test(password.value) }
+  { label: 'Un carácter especial (!#$…)', met: /[^A-Za-z0-9\s]/.test(password.value) }
 ])
 
 const allRulesMet = computed(() => rules.value.every(r => r.met))
