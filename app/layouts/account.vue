@@ -17,8 +17,7 @@ const memberSince = computed(() =>
 const rewards = 1280
 
 const nav = [
-  { label: 'Resumen', to: '/my-profile' },
-  { label: 'Mis pedidos', to: '/my-profile/orders' },
+  { label: 'Mis pedidos', to: '/my-profile' },
   { label: 'Direcciones', to: '/my-profile/addresses' },
   { label: 'Mis datos', to: '/my-profile/data' }
 ]
