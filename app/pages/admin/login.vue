@@ -9,15 +9,17 @@ const authStore = useAuthStore()
 
 const loginSchema = z.object({
   username: z.string().min(1, 'El usuario es requerido'),
-  password: z.string().min(1, 'La contraseña es requerida')
+  password: z.string().min(1, 'La contraseña es requerida'),
+  turnstileToken: z.string().min(1, 'Verifica que no eres un robot')
 })
 
 type LoginForm = z.infer<typeof loginSchema>
 
-const form = reactive<LoginForm>({ username: '', password: '' })
+const form = reactive<LoginForm>({ username: '', password: '', turnstileToken: '' })
 const loading = ref(false)
 const errorMessage = ref('')
 const showPassword = ref(false)
+const turnstileRef = useTemplateRef('turnstileRef')
 
 async function onSubmit(event: FormSubmitEvent<LoginForm>) {
   loading.value = true
@@ -27,6 +29,8 @@ async function onSubmit(event: FormSubmitEvent<LoginForm>) {
     await navigateTo('/admin/product')
   } catch {
     errorMessage.value = 'Credenciales incorrectas. Verifica tu usuario y contraseña.'
+    form.turnstileToken = ''
+    turnstileRef.value?.reset()
   } finally {
     loading.value = false
   }
@@ -172,9 +176,20 @@ const features = [
               />
             </UFormField>
 
+            <UFormField name="turnstileToken">
+              <div class="flex justify-center">
+                <NuxtTurnstile
+                  ref="turnstileRef"
+                  v-model="form.turnstileToken"
+                  :options="{ theme: 'light', language: 'es' }"
+                />
+              </div>
+            </UFormField>
+
             <UButton
               type="submit"
               :loading="loading"
+              :disabled="!form.turnstileToken"
               block
               size="lg"
               class="mt-2"

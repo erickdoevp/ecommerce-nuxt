@@ -1,4 +1,5 @@
 import { createAdminApi } from '~/api/admin-api'
+import type { ProductDetail } from '../types/product-detail'
 
 export const useCreateProduct = () => {
   const isLoading = ref(false)
@@ -8,7 +9,7 @@ export const useCreateProduct = () => {
     try {
       isLoading.value = true
       const api = createAdminApi()
-      const data = await api('/products', {
+      const data = await api<ProductDetail>('/products', {
         method: 'POST',
         body: formData
       })

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useTreeCategory } from '~/features/category/composables/useTreeCategory'
+import { useAddProductToCollection } from '~/features/collection/composables/useAddProductToCollection'
+import { useListCollection } from '~/features/collection/composables/useListCollection'
 import CreateProductForm from '~/features/product/components/CreateProductForm.vue'
 import ProductMediaCard from '~/features/product/components/ProductMediaCard.vue'
+import ProductOrganizationCard from '~/features/product/components/ProductOrganizationCard.vue'
 import ProductState from '~/features/product/components/ProductState.vue'
 import ProductVariantsCard from '~/features/product/components/ProductVariantsCard.vue'
 import { useCreateProduct } from '~/features/product/composables/useCreateProduct'
@@ -14,11 +17,14 @@ const { getSizes, selectSizes } = useListSize()
 const { getColors, selectColors } = useListColor()
 const { getTaxConfigs, selectTax } = useListTax()
 const { getCategories, treeSelectCategory } = useTreeCategory()
+const { getCollections, selectCollections } = useListCollection()
 const { form, images, variantGrid, variantData } = useProductForm()
 const { createProduct, isLoading } = useCreateProduct()
+const { addProductToCollection } = useAddProductToCollection()
 const toast = useToast()
 
 const productFormRef = useTemplateRef('productFormRef')
+const organizationRef = useTemplateRef('organizationRef')
 
 async function onSave(): Promise<void> {
   try {
@@ -66,6 +72,10 @@ async function onSave(): Promise<void> {
 
   const created = await createProduct(formData)
   if (created) {
+    const collectionId = organizationRef.value?.collectionId
+    if (collectionId) {
+      await addProductToCollection(collectionId, created.id)
+    }
     toast.add({ title: 'Producto creado', color: 'success', icon: 'i-lucide-check-circle' })
     navigateTo('/admin/product')
   }
@@ -76,6 +86,7 @@ onMounted(() => {
   getSizes()
   getTaxConfigs()
   getCategories()
+  getCollections()
 })
 </script>
 
@@ -134,6 +145,10 @@ onMounted(() => {
         </div>
         <div class="flex flex-col gap-3 flex-1">
           <ProductState />
+          <ProductOrganizationCard
+            ref="organizationRef"
+            :select-collections="selectCollections"
+          />
         </div>
       </div>
     </UContainer>
