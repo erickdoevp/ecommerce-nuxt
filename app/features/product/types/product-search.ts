@@ -3,11 +3,13 @@ export interface ProductSearchQuery {
   size: number
   sort: string
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
-  categoryId?: string
+  // Filtros multivalor: aceptan uno (string) o varios (string[]) → IN en backend.
+  categoryId?: string | string[]
+  collectionId?: string | string[]
+  colorId?: string | string[]
+  sizeId?: string | string[]
   minPrice?: number
   maxPrice?: number
-  sizeId?: string
-  colorId?: string
   name?: string
 }
 
