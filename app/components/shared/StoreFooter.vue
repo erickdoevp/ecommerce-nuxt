@@ -1,17 +1,17 @@
 <script setup lang="ts">
-const shopLinks = [
-  { label: 'Conjuntos', to: '/categorias/conjuntos' },
-  { label: 'Bras', to: '/categorias/bras' },
-  { label: 'Tangas', to: '/categorias/tangas' },
-  { label: 'Bodies', to: '/categorias/bodies' },
-  { label: 'Ligueros', to: '/categorias/ligueros' }
-]
+import { useRootCategories } from '~/features/category/composables/useRootCategories'
+
+const { categories } = useRootCategories()
+
+const shopLinks = computed(() => {
+  return categories.value.map(c => ({ label: c.name, to: `/categories/${c.slug}` }))
+})
 
 const helpLinks = [
-  { label: 'Envíos y entregas', to: '/envios' },
-  { label: 'Cambios', to: '/cambios' },
-  { label: 'Guía de tallas', to: '/guia-de-tallas' },
-  { label: 'Contacto', to: '/contacto' }
+  { label: 'Envíos y entregas', to: '/shipment' },
+  { label: 'Cambios', to: '/product-exchange' },
+  { label: 'Guía de tallas', to: '/size-guide' },
+  { label: 'Contacto', to: '/contact' }
 ]
 
 const email = ref('')
@@ -68,7 +68,10 @@ function onSubscribe() {
           <p class="text-[11px] tracking-[0.2em] uppercase text-white/50">
             Tienda
           </p>
-          <ul class="mt-6 space-y-3.5">
+          <ul
+            v-if="shopLinks.length"
+            class="mt-6 space-y-3.5"
+          >
             <li
               v-for="link in shopLinks"
               :key="link.to"
