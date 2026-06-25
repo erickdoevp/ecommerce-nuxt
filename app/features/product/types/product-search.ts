@@ -13,6 +13,16 @@ export interface ProductSearchQuery {
   name?: string
 }
 
+// Forma mínima que consume ProductCard. Tanto Content (listado) como
+// CollectionProduct (detalle de colección) son asignables a esta interfaz.
+export interface ProductCardItem {
+  name: string
+  slug: string
+  basePrice: number
+  primaryImageUrl: string | null
+  category?: { name: string } | null
+}
+
 export interface ProductSearchResponse {
   content: Content[]
   page: Page

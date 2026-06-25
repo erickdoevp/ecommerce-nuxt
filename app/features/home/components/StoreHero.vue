@@ -11,7 +11,7 @@ const loop = [...marquee, ...marquee, ...marquee]
     <!-- Franja de anuncio -->
     <NuxtLink
       to="/sign-in"
-      class="group relative flex items-center justify-center gap-2 overflow-hidden border-b border-wine-200/60 bg-gradient-to-b from-wine-100/60 to-transparent py-3 text-center text-[11px] tracking-[0.2em] uppercase text-wine-500 transition-colors hover:text-wine-700"
+      class="group relative flex items-center justify-center gap-2 overflow-hidden border-b border-wine-200/60 bg-gradient-to-b from-wine-100/60 to-transparent py-3 text-center text-[8px] tracking-[0.2em] uppercase text-wine-500 transition-colors hover:text-wine-700"
     >
       <!-- Resplandor difuminado de fondo -->
       <span

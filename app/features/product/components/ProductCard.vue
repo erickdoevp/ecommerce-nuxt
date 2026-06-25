@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Content } from '../types/product-search'
+import type { ProductCardItem } from '../types/product-search'
 
-defineProps<{ product: Content }>()
+defineProps<{ product: ProductCardItem }>()
 
 const formatPrice = (value: number) =>
   value.toLocaleString('es-MX', { maximumFractionDigits: 0 })

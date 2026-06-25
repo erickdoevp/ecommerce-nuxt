@@ -18,6 +18,30 @@ export interface CollectionContent {
   updatedAt: string
 }
 
+export interface CollectionProduct {
+  id: string
+  name: string
+  slug: string
+  basePrice: number
+  primaryImageUrl: string | null
+}
+
+export interface CollectionDetail {
+  id: string
+  name: string
+  slug: string
+  // El backend declara description como Object; hoy llega como string. Si la BD
+  // guarda rich text estructurado podría llegar como objeto/array. Confirmar.
+  description: string | null
+  imageUrl: string | null
+  active: boolean
+  position: number
+  // Solo productos PUBLISHED; vacío ([]) si no hay ninguno, nunca null.
+  products: CollectionProduct[]
+  createdAt: string
+  updatedAt: string
+}
+
 export interface CollectionSearchResponse {
   content: CollectionContent[]
   page: {

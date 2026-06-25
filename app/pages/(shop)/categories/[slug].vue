@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'store'
+})
+
 const { slug } = useRoute().params
 </script>
 
