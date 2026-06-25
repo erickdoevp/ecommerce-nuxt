@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ProductCardItem } from '../types/product-search'
 
-defineProps<{ product: ProductCardItem }>()
+const props = defineProps<{ product: ProductCardItem, to?: string }>()
+
+const productLink = computed(() => props.to ?? `/products/${props.product.slug}`)
 
 const formatPrice = (value: number) =>
   value.toLocaleString('es-MX', { maximumFractionDigits: 0 })
@@ -12,7 +14,7 @@ const formatPrice = (value: number) =>
     <!-- Imagen -->
     <div class="relative aspect-[3/4] bg-elevated">
       <NuxtLink
-        :to="`/products/${product.slug}`"
+        :to="productLink"
         class="absolute inset-0"
       >
         <img
@@ -40,7 +42,7 @@ const formatPrice = (value: number) =>
       <p class="text-[10px] tracking-[0.2em] uppercase text-dimmed">
         {{ product.category?.name }}
       </p>
-      <NuxtLink :to="`/products/${product.slug}`">
+      <NuxtLink :to="productLink">
         <h3 class="mt-1 font-serif text-base text-highlighted transition-colors group-hover:text-wine-500">
           {{ product.name }}
         </h3>
@@ -50,7 +52,7 @@ const formatPrice = (value: number) =>
         <span class="ml-1 text-xs text-muted">MXN</span>
       </p>
       <UButton
-        :to="`/products/${product.slug}`"
+        :to="productLink"
         label="Agregar"
         color="neutral"
         variant="outline"

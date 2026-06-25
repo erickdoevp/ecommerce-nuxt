@@ -172,6 +172,7 @@ const open = reactive({
           v-for="product in products"
           :key="product.id"
           :product="product"
+          :to="`/products/${product.slug}`"
         />
       </div>
       <p
