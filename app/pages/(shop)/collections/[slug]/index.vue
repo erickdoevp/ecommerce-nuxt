@@ -140,7 +140,7 @@ const heroGradient = computed(() =>
               v-for="product in products"
               :key="product.id"
               :product="product"
-              :to="`/collections/${slug}/${product.slug}`"
+              :to="`/products/${product.slug}`"
             />
           </div>
 
