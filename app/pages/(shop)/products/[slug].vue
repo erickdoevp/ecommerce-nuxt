@@ -2,6 +2,7 @@
 import { usePublicProductDetail } from '~/features/product/composables/usePublicProductDetail'
 import ProductDetailView from '~/features/product/components/ProductDetailView.vue'
 import ProductReviews from '~/features/review/components/ProductReviews.vue'
+import RelatedProducts from '~/features/product/components/RelatedProducts.vue'
 
 definePageMeta({
   layout: 'store'
@@ -74,6 +75,12 @@ const { product, pending } = usePublicProductDetail(slug)
     <ProductReviews
       v-if="product"
       :product-id="product.id"
+    />
+
+    <RelatedProducts
+      v-if="product"
+      :category-id="product.category.id"
+      :exclude-product-id="product.id"
     />
   </div>
 </template>
