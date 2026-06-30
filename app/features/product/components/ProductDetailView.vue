@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type { ProductDetail } from '../types/product-detail'
 import { extractText } from '../utils/extract-text'
+import { useCart } from '~/features/cart/composables/useCart'
 
 const props = defineProps<{ product: ProductDetail }>()
+
+const { addItem, openCart, error: cartError, isLoading: isCartLoading } = useCart()
+const toast = useToast()
 
 const formatPrice = (value: number) =>
   value.toLocaleString('es-MX', { maximumFractionDigits: 0 })
@@ -92,11 +96,32 @@ const selectColor = (id: string) => {
   activeImage.value = null
 }
 
+const canAdd = computed(() =>
+  !!selectedVariant.value && selectedVariant.value.availableStock > 0
+)
+
 const actionLabel = computed(() => {
   if (!selectedSizeId.value) return 'Elegir talla'
-  if (!selectedVariant.value || selectedVariant.value.availableStock <= 0) return 'Sin stock'
+  if (!canAdd.value) return 'Sin stock'
   return 'Agregar'
 })
+
+async function onAddToCart() {
+  if (!canAdd.value || !selectedVariant.value) return
+  const result = await addItem(selectedVariant.value.id, quantity.value)
+  // El backend puede rechazar por stock (400) o variante inactiva (422); en
+  // ese caso addItem devuelve undefined y el motivo queda en cartError.
+  if (result) {
+    openCart()
+  } else {
+    toast.add({
+      title: 'No se pudo agregar',
+      description: cartError.value ?? undefined,
+      color: 'error',
+      icon: 'i-lucide-circle-alert'
+    })
+  }
+}
 
 const descriptionText = computed(() => extractText(props.product.description))
 
@@ -299,8 +324,11 @@ const toggleSection = (key: string) => {
           color="primary"
           size="xl"
           block
+          :disabled="!canAdd"
+          :loading="isCartLoading"
           class="flex-1 justify-center rounded-full"
           :ui="{ label: 'uppercase tracking-[0.15em] text-[12px]' }"
+          @click="onAddToCart"
         />
 
         <button

@@ -2,10 +2,12 @@
 import { useScroll } from '@vueuse/core'
 import { usePublicCategoryTree } from '~/features/category/composables/usePublicCategoryTree'
 import { useActiveCollections } from '~/features/collection/composables/useActiveCollections'
+import { useCart } from '~/features/cart/composables/useCart'
 import type { CategoryTree } from '~/features/category/types/category-tree'
 
 const { categories: tree } = usePublicCategoryTree()
 const { collections } = useActiveCollections()
+const { itemCount, openCart } = useCart()
 
 const hasChildren = (cat: CategoryTree) => (cat.children?.length ?? 0) > 0
 
@@ -168,12 +170,20 @@ const headerHidden = computed(
             variant="ghost"
             aria-label="Favoritos"
           />
-          <UButton
-            icon="i-lucide-shopping-bag"
-            color="neutral"
-            variant="ghost"
-            aria-label="Carrito"
-          />
+          <UChip
+            :text="itemCount"
+            :show="itemCount > 0"
+            color="primary"
+            size="lg"
+          >
+            <UButton
+              icon="i-lucide-shopping-bag"
+              color="neutral"
+              variant="ghost"
+              :aria-label="`Carrito${itemCount ? `, ${itemCount} artículos` : ''}`"
+              @click="openCart()"
+            />
+          </UChip>
         </div>
       </div>
     </div>
